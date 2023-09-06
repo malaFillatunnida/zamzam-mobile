@@ -11,6 +11,7 @@ import {
 
 import Jamaah from "./Jamaah/Jamaah.js";
 import { FontAwesome5 } from "@expo/vector-icons/build/Icons.js";
+import Paket from "./paket/Paket.js";
 
 const Tab = createBottomTabNavigator();
 
@@ -53,7 +54,7 @@ export default function HomeScreen() {
         />
         <Tab.Screen
           name="Data Paket"
-          component={Jamaah}
+          component={Paket}
           options={{
             tabBarIcon: ({ color, size }) => (
               <FontAwesome

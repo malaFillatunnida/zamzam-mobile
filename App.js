@@ -4,8 +4,8 @@ import { StyleSheet } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Jamaah from "./screens/Jamaah/Jamaah.js";
 import HomeScreen from "./screens/HomeScreen.js";
+import Login from "./screens/Login.js";
 
 
 
@@ -22,11 +22,11 @@ export default function App() {
           options={{ headerShown: false }}
         /> */}
 
-            <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ headerShown: false }}
-          />
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
 
       </Stack.Navigator>
     </NavigationContainer>

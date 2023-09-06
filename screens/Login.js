@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import {
     StyleSheet,
@@ -10,50 +11,48 @@ import {
 } from "react-native";
 
 export default function Login({ navigation }) {
-    // const [email, setEmail] = useState("");
-    // const [password, setPassword] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    // const login = async () => {
-    //     try {
-    //         const { data, status } = await axios.post(`/login`, {
-    //             email: email,
-    //             password: password,
-    //         });
+    const login = async () => {
+        if (!username || !password) {
+            setErrorMessage("* Username and password cannot be empty!");
+            return;
+        }
 
-    //         if (status === 200) {
-    //             storeData("token", data.token);
-    //             // storeData("role", data.userData.role);
-    //             // console.log(data.userData.role);
+        try {
+            const { data, status } = await axios.post(`http://192.168.137.73:8081/users/login`, {
+                username: username,
+                password: password,
+            });
 
-    //             navigation.navigate("Home");
+            if (status === 200) {
+                localStorage.setItem('token', data.token);
+                // console.log(data.token);
+                navigation.navigate("HomeScreen");
 
-    //             const idUser = data.userData.id;
-    //             storeData("id", idUser.toString());
-    //         } else {
-    //             throw new Error("Login bermasalah");
-    //         }
-    //     } catch (err) {
-    //         console.log(err);
-    //         Alert.alert("Error login");
-    //     }
-    // };
-
-    // const registerPage = () => {
-    //     navigation.navigate("Register");
-    // };
+            } else {
+                throw new Error("Login bermasalah");
+            }
+        } catch (err) {
+            console.log(err);
+            // Alert.alert("Error login");
+            setErrorMessage("Error login");
+        }
+    };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.welcome}>Login your Account.</Text>
-            {/* <Image style={styles.image} source={require("../assets/login.png")} />
+            <Image style={styles.image} source={require("../assets/login.png")} />
             <Text style={styles.welcome}>Login your Account.</Text>
 
             <View style={styles.inputView}>
                 <TextInput
                     style={styles.TextInput}
-                    // onChangeText={setEmail}
-                    // value={email}
-                    placeholder="Email."
+                    onChangeText={setUsername}
+                    value={username}
+                    placeholder="Username."
                 />
             </View>
 
@@ -61,28 +60,17 @@ export default function Login({ navigation }) {
                 <TextInput
                     style={styles.TextInput}
                     onChangeText={setPassword}
-                    // value={password}
-                    // secureTextEntry={true}
+                    value={password}
+                    secureTextEntry={true}
                     placeholder="Password."
                 />
             </View>
-
+            {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
             <TouchableOpacity style={styles.loginBtn}
-            // onPress={login}
+                onPress={login}
             >
                 <Text style={styles.loginText}>LOGIN</Text>
             </TouchableOpacity>
-
-            <View style={styles.acount}>
-                <Text style={styles.dont}>Don't have an account ? </Text>
-                <TouchableOpacity>
-                    <Text style={styles.registerText}
-                    // onPress={registerPage}
-                    >
-                        Register
-                    </Text>
-                </TouchableOpacity>
-            </View> */}
         </View>
     );
 }
@@ -101,7 +89,7 @@ const styles = StyleSheet.create({
     },
 
     welcome: {
-        color: "#B22222",
+        color: "#870144",
         fontSize: 22,
         marginBottom: 40,
     },
@@ -133,7 +121,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginTop: 20,
         borderRadius: 5,
-        backgroundColor: "#B22222",
+        backgroundColor: "#870144",
     },
 
     loginText: {
@@ -142,13 +130,8 @@ const styles = StyleSheet.create({
         color: "white",
     },
 
-    acount: {
-        flexDirection: "row",
-        marginTop: 20,
-    },
-
-    registerText: {
-        color: "#B22222",
-        textDecorationLine: "underline",
+    errorMessage: {
+        color: "red",
+        fontWeight: 'bold',
     },
 });

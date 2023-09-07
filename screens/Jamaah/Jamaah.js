@@ -171,6 +171,10 @@ export default function Jamaah({ navigation }) {
     navigation.navigate("Tambah Jamaah");
   };
 
+  const gotoEditJamaah = () => {
+    navigation.navigate("Edit Jamaah");
+  };
+
   return (
     <View>
       <View style={styles.head}>
@@ -263,12 +267,14 @@ export default function Jamaah({ navigation }) {
                   </Text>
                   <Text style={styles.cell}>
                     <View style={styles.iconContainer}>
-                      <FontAwesome5
-                        name="pencil-alt"
-                        size={15}
-                        color="#870144"
-                        style={{ marginRight: 5 }}
-                      />
+                      <TouchableOpacity onPress={gotoEditJamaah}>
+                        <FontAwesome5
+                          name="pencil-alt"
+                          size={15}
+                          color="#870144"
+                          style={{ marginRight: 5 }}
+                        />
+                      </TouchableOpacity>
                       <Feather
                         name="printer"
                         size={15}

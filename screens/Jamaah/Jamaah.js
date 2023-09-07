@@ -1,132 +1,450 @@
-import { View, Text, FlatList, StyleSheet,ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Button,
+} from "react-native";
 import React, { useEffect, useState } from "react";
-// import { instance as axios } from "../Util/api";
-// import { getStoreData } from "../Util/Util";
-// import Book from "../components/Book";
-import { FontAwesome5 } from "@expo/vector-icons";
-import { DataTable } from "react-native-paper";
-
+import {
+  AntDesign,
+  Feather,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons/build/Icons";
+import SelectDropdown from "react-native-select-dropdown";
 
 const data = [
-    { id: '1', name: 'Faza Sania', jekel: 'Perempuan', paket: 'Paket 1', phoneNumber: '123456789', partner: 'Mitra 1', voucherCode: 'ABC123', status: 'Active' },
-    { id: '2', name: 'Mala Fillatunnida', jekel: 'Perempuan', paket: 'Paket 2', phoneNumber: '987654321', partner: 'Mitra 2', voucherCode: 'XYZ789', status: 'Inactive' },
-    { id: '3', name: 'Kamilia Qotrunnada', jekel: 'Perempuan', paket: 'Paket 3', phoneNumber: '555555555', partner: 'Mitra 3', voucherCode: 'DEF456', status: 'Active' },
-    { id: '4', name: 'Riska Amelia', jekel: 'Perempuan', paket: 'Paket 4', phoneNumber: '111111111', partner: 'Mitra 4', voucherCode: 'GHI789', status: 'Inactive' },
-    { id: '5', name: 'Aveecena ', jekel: 'Laki', paket: 'Paket 5', phoneNumber: '999999999', partner: 'Mitra 5', voucherCode: 'JKL123', status: 'Active' },
-  ];
-  
-export default function Jamaah() {
-  return (
-    <ScrollView horizontal>
-    <View style={styles.container}>
-      <View style={styles.all}>
-      <ScrollView horizontal={true}>
-      <DataTable>
-        <DataTable.Header style={styles.wid}>
-          <DataTable.Title style={styles.id}>NO</DataTable.Title>
-          <DataTable.Title style={styles.nama}>NAMA LENGKAP</DataTable.Title>
-          <DataTable.Title style={styles.title}>JENIS KELAMIN</DataTable.Title>
-          <DataTable.Title style={styles.total}>PAKET</DataTable.Title>
-          <DataTable.Title style={styles.borrow}>NO TELP/HP</DataTable.Title>
-          <DataTable.Title style={styles.return}>MITRA</DataTable.Title>
-          <DataTable.Title style={styles.count}>VOUCHER CODE</DataTable.Title>
-          <DataTable.Title style={styles.count}>ACTION</DataTable.Title>
-        </DataTable.Header>
+  {
+    id: "1",
+    name: "Faza Sania",
+    jekel: "Perempuan",
+    paket: "Paket 1",
+    phoneNumber: "123456789",
+    partner: "Mitra 1",
+    cabang: "Cabang Jakarta",
+    voucherCode: "ABC123",
+    status: "Active",
+  },
+  {
+    id: "2",
+    name: "Mala Fillatunnida",
+    jekel: "Perempuan",
+    paket: "Paket 2",
+    phoneNumber: "987654321",
+    partner: "Mitra 2",
+    cabang: "Cabang Jakarta",
+    voucherCode: "XYZ789",
+    status: "Inactive",
+  },
+  {
+    id: "3",
+    name: "Kamilia Qotrunnada",
+    jekel: "Perempuan",
+    paket: "Paket 3",
+    phoneNumber: "555555555",
+    partner: "Mitra 3",
+    cabang: "Cabang Jakarta",
+    voucherCode: "DEF456",
+    status: "Active",
+  },
+  {
+    id: "4",
+    name: "Riska Amelia",
+    jekel: "Perempuan",
+    paket: "Paket 4",
+    phoneNumber: "111111111",
+    partner: "Nurjana Wahidudin",
+    cabang: "Cabang Jakarta",
+    voucherCode: "GHI789",
+    status: "Inactive",
+  },
+  {
+    id: "5",
+    name: "Aveecena ",
+    jekel: "Laki",
+    paket: "Paket 5",
+    phoneNumber: "999999999",
+    partner: "Syahla Azifatul 5",
+    cabang: "Cabang Jakarta",
+    voucherCode: "JKL123",
+    status: "Active",
+  },
+  {
+    id: "6",
+    name: "Aveecena ",
+    jekel: "Laki",
+    paket: "Paket 5",
+    phoneNumber: "999999999",
+    partner: "Syahla Azifatul 5",
+    cabang: "Cabang Jakarta",
+    voucherCode: "JKL123",
+    status: "Active",
+  },
+  {
+    id: "7",
+    name: "Aveecena ",
+    jekel: "Laki",
+    paket: "Paket 5",
+    phoneNumber: "999999999",
+    partner: "Syahla Azifatul 5",
+    cabang: "Cabang Jakarta",
+    voucherCode: "JKL123",
+    status: "Active",
+  },
+  {
+    id: "8",
+    name: "Aveecena ",
+    jekel: "Laki",
+    paket: "Paket 5",
+    phoneNumber: "999999999",
+    partner: "Syahla Azifatul 5",
+    cabang: "Cabang Jakarta",
+    voucherCode: "JKL123",
+    status: "Active",
+  },
+  {
+    id: "9",
+    name: "Aveecena ",
+    jekel: "Laki",
+    paket: "Paket 5",
+    phoneNumber: "999999999",
+    partner: "Syahla Azifatul 5",
+    cabang: "Cabang Jakarta",
+    voucherCode: "JKL123",
+    status: "Active",
+  },
+  {
+    id: "10",
+    name: "Aveecena ",
+    jekel: "Laki",
+    paket: "Paket 5",
+    phoneNumber: "999999999",
+    partner: "Syahla Azifatul 5",
+    cabang: "Cabang Jakarta",
+    voucherCode: "JKL123",
+    status: "Active",
+  },
+];
 
-        <FlatList
-          data={data}
-          renderItem={({ item }) => 
+const itemsPerPage = 2; // Number of rows per page
+
+export default function Kafalah() {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
+
+  // Handle perubahan jumlah baris per halaman
+  const changeItemsPerPage = (newPerPage) => {
+    setItemsPerPage(newPerPage);
+
+  };
+  const itemsPerPageOptions = ["5", "10", "20"];
+
+  // Calculate the start and end indexes for the current page
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  // Slice the data to display only the rows for the current page
+  const pageData = data.slice(startIndex, endIndex);
+
+  // Function to handle page navigation
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const buttonColor = "#870144";
+  return (
+    <View>
+      <View style={styles.head}>
+        <Text style={{ fontSize: 18, fontWeight: "bold", top: 4 }}>
+          Daftar Jamaah
+        </Text>
+        <TouchableOpacity
+          // onPress={}
+          style={styles.buttonContainer}
+        >
           <View>
-          <DataTable.Row style={styles.row}>
-            <DataTable.Cell style={{ width: 5 }}>{item.id}</DataTable.Cell>
-            <DataTable.Cell style={styles.nama}>
-              {item.name}
-            </DataTable.Cell>
-            <DataTable.Cell style={styles.title}>
-              {item.jekel}
-            </DataTable.Cell>
-            <DataTable.Cell style={{ marginLeft: 25 }}>
-              {item.paket}
-            </DataTable.Cell>
-            <DataTable.Cell style={styles.total}>
-              {" "}
-              {item.phoneNumber}
-            </DataTable.Cell>
-            <DataTable.Cell style={styles.borrow}>
-              {" "}
-              {item.partner}
-            </DataTable.Cell>
-            <DataTable.Cell style={styles.borrow}>
-              {" "}
-              {item.voucherCode}
-            </DataTable.Cell>
-            <DataTable.Cell style={styles.borrow}>
-              {" "}
-              {item.status}
-            </DataTable.Cell>
-         
-          </DataTable.Row>
-        </View>
-        }
-          keyExtractor={(item, index) => index}
-        />
-      </DataTable>
-    </ScrollView>
-     
+            <AntDesign name="plus" size={14} color="#fff" />
+          </View>
+          <Text style={styles.buttonText}>Tambah Jamaah</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <ScrollView horizontal={true} style={{ width: "auto" }}>
+          <View style={styles.container}>
+            {/* Search */}
+            <View style={styles.searchContainer}>
+              {/* Kotak Pencarian */}
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Cari Nama Lengkap"
+                autoFocus={false}
+              />
+              <View style={styles.iconContainer}>
+                <MaterialIcons
+                  name="image-search"
+                  style={styles.icons}
+                  size={20}
+                  color="#870144"
+                />
+                <MaterialIcons
+                  name="person-search"
+                  style={styles.icons}
+                  size={20}
+                  color="#870144"
+                />
+                <MaterialCommunityIcons
+                  name="text-search"
+                  style={styles.icons}
+                  size={20}
+                  color="#870144"
+                />
+              </View>
+            </View>
+            <FlatList
+              data={pageData}
+              keyExtractor={(item) => item.id.toString()}
+              ListHeaderComponent={() => (
+                <View style={styles.Hrow}>
+                  <Text style={[styles.Hcell, styles.header, { width: 50 }]}>
+                    NO
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>
+                    NAMA LENGKAP
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>
+                    JENIS KELAMIN
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>NAMA PAKET</Text>
+                  <Text style={[styles.Hcell, styles.header]}>NO TELP/HP</Text>
+                  <Text style={[styles.Hcell, styles.header]}>MITRA</Text>
+                  <Text style={[styles.Hcell, styles.header]}>CABANG</Text>
+                  <Text style={[styles.Hcell, styles.header]}>
+                    VOUCHER CODE
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>STATUS</Text>
+                  <Text style={[styles.Hcell, styles.header]}>ACTION</Text>
+                </View>
+              )}
+              renderItem={({ item }) => (
+                <View style={styles.row}>
+                  <Text style={[styles.cell, { width: 40, textAlign: "left" }]}>
+                    {item.id}
+                  </Text>
+                  <Text style={[styles.cell, { width: 100 }]}>{item.name}</Text>
+                  <Text style={styles.cell}>{item.jekel}</Text>
+                  <Text style={styles.cell}>{item.paket}</Text>
+                  <Text style={[styles.cell, { width: 95 }]}>{item.phoneNumber}</Text>
+                  <Text style={styles.cell}>{item.partner}</Text>
+                  <Text style={styles.cell}>{item.cabang}</Text>
+                  <Text style={[styles.cell, { width: 95 }]}>
+                    {item.voucherCode}
+                  </Text>
+                  <Text style={[styles.cell, { width: 88 }]}>
+                    {item.status}
+                  </Text>
+                  <Text style={styles.cell}>
+                    <View style={styles.iconContainer}>
+                      <FontAwesome5
+                        name="pencil-alt"
+                        size={15}
+                        color="#870144"
+                        style={{ marginRight: 1 }}
+                      />
+                      <Feather
+                        name="printer"
+                        size={15}
+                        color="#870144"
+                        style={{ marginRight: 1 }}
+                      />
+                      <MaterialCommunityIcons
+                        name="credit-card-check-outline"
+                        size={15}
+                        color="#870144"
+                      />
+                    </View>
+                  </Text>
+                </View>
+              )}
+            />
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            margin: 8,
+          }}
+        >
+          <View style={styles.iconContainer}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex",
+                alignItems: "center",
+                height: 30,
+              }}
+            >
+              <Text>Rows per page</Text>
+              <Text style={{ marginHorizontal: 5 }}>
+                <SelectDropdown
+                  data={itemsPerPageOptions}
+                  onSelect={(selectedItem, index) => {
+                    changeItemsPerPage(parseInt(selectedItem));
+                  }}
+                  buttonTextAfterSelection={(selectedItem, index) => {
+                    return selectedItem;
+                  }}
+                  rowTextForSelection={(item, index) => {
+                    return item;
+                  }}
+                  defaultButtonText={itemsPerPage} // Text pada tombol dropdown
+                  buttonStyle={{
+                    height: 32,
+                    backgroundColor: "#fff",
+                    borderRadius: 5,
+                    width: 48,
+                    elevation: 2,
+                  }}
+                  buttonTextStyle={{ fontSize: 12 }}
+                  renderDropdownIcon={() => (
+                    <Text style={{ fontSize: 13 }}>▼</Text>
+                  )}
+                  dropdownTextStyle={{ fontSize: 20 }}
+                  dropdownTextHighlightStyle={{ backgroundColor: "#6E759F" }}
+                />
+              </Text>
+            </View>
+
+            <Button
+              title="<"
+              onPress={handlePrevPage}
+              buttonStyle={{ height: 5 }}
+              color="#6E759F"
+              disabled={currentPage === 0}
+            />
+            <Button
+              title=">"
+              onPress={handleNextPage}
+              buttonStyle={{ height: 5 }}
+              color="#870144"
+              disabled={
+                currentPage === Math.ceil(data.length / itemsPerPage) - 1
+              }
+            />
+          </View>
+          </View>
       </View>
     </View>
-    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-    // container: {
-    //     flex: 1,
-    //     // padding: 10,
-    //     top:50
-    //   },
-    //   Hrow: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center',
-    //     // padding: 10,
-    //     borderBottomWidth: 1,
-    //     borderBottomColor: '#ccc',
-    //   },
-    //   row: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center',
-    //     padding: 5,
-    //     borderBottomWidth: 1,
-    //     borderBottomColor: '#ccc',
-    //   },
-    //   cell: {
-    //     flex: 1,
-    //     padding: 5,
-    //     textAlign: 'center',
-    //     paddingHorizontal: 10,
-    //   },
-    //   Hcell: {
-    //     flex: 1,
-    //     padding: 3,
-    //     paddingHorizontal: 10,
-    //     textAlign: 'center',
-    //     backgroundColor:"#870144"
-    //   },
-    //   header: {
-    //     fontWeight: 'bold',
-    //     padding:3
-    //   },
-    //   specialHeaderText: {
-    //     width: 50,
-    //   },
-
-
-      nama: {
-        width: 30,
-      },
-      wid: {
-        width: 600,
-      },
-  });
+  container: {
+    // flex: 1,
+    marginTop: 18,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    justifyContent: "space-between",
+  },
+  Hrow: {
+    flexDirection: "row",
+    // justifyContent: "space-between",
+    alignItems: "center",
+    padding: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  Hcell: {
+    flex: 1,
+    padding: 30,
+    paddingHorizontal: 15,
+    textAlign: "left",
+    backgroundColor: "#870144",
+    color: "#fff",
+  },
+  header: {
+    fontWeight: "bold",
+    padding: 12,
+    width: 120,
+  },
+  cell: {
+    flex: 1,
+    padding: 3,
+    textAlign: "left",
+    paddingHorizontal: 10,
+    fontSize: 15,
+    width: 105
+  },
+  card: {
+    backgroundColor: "white",
+    elevation: 4, // Efek shadow kartu
+    marginHorizontal: 10,
+    padding: 0,
+    borderRadius: 4,
+    //   paddingBottom:10
+  },
+  searchInput: {
+    height: 30,
+    width: 200,
+    borderColor: "gray",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginLeft: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    marginLeft: 10,
+  },
+  icons: {
+    padding: 10,
+  },
+  iconAction: {
+    flexDirection: "row",
+  },
+  head: {
+    margin: 20,
+    fontWeight: "bold",
+    fontSize: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#870144",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
+});

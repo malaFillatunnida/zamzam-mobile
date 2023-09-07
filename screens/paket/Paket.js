@@ -1,122 +1,383 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, Text } from 'react-native';
-import { DataTable } from 'react-native-paper';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  Dimensions,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  AntDesign,
+  Feather,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons/build/Icons";
+import SelectDropdown from "react-native-select-dropdown";
+
+const data = [ 
+  { 
+      no: 1, 
+      namaPaket: 'Wisata A', 
+      harga: '$100', 
+      uangMuka: '$20', 
+      mataUang: 'IDR', 
+      lamaHari: 7, 
+      namaTourGuide: 'Tour Guide A', 
+      tipePaket: 'Paket A', 
+      jenis: 'Jenis A', 
+      status: 'Aktif', 
+      cabang: 'Cabang A', 
+      pnr: 'PNR A', 
+      pax: 2, 
+      issued: 'Yes', 
+      action: 'Action A', 
+  }, 
+  { 
+      no: 2, 
+      namaPaket: 'Wisata B', 
+      harga: '$120', 
+      uangMuka: '$20', 
+      mataUang: 'IDR', 
+      lamaHari: 7, 
+      namaTourGuide: 'Tour Guide A', 
+      tipePaket: 'Paket A', 
+      jenis: 'Jenis A', 
+      status: 'Aktif', 
+      cabang: 'Cabang A', 
+      pnr: 'PNR A', 
+      pax: 2, 
+      issued: 'Yes', 
+      action: 'Action A', 
+  }, 
+  { 
+      no: 3, 
+      namaPaket: 'Wisata C', 
+      harga: '$130', 
+      uangMuka: '$20', 
+      mataUang: 'IDR', 
+      lamaHari: 7, 
+      namaTourGuide: 'Tour Guide A', 
+      tipePaket: 'Paket A', 
+      jenis: 'Jenis A', 
+      status: 'Aktif', 
+      cabang: 'Cabang A', 
+      pnr: 'PNR A', 
+      pax: 2, 
+      issued: 'Yes', 
+      action: 'Action A', 
+  }, 
+];
+
 
 export default function Paket() {
-    const data = [
-        {
-            no: 1,
-            namaPaket: 'Wisata A',
-            harga: '$100',
-            uangMuka: '$20',
-            mataUang: 'IDR',
-            lamaHari: 7,
-            namaTourGuide: 'Tour Guide A',
-            tipePaket: 'Paket A',
-            jenis: 'Jenis A',
-            status: 'Aktif',
-            cabang: 'Cabang A',
-            pnr: 'PNR A',
-            pax: 2,
-            issued: 'Yes',
-            action: 'Action A',
-        },
-        {
-            no: 2,
-            namaPaket: 'Wisata A',
-            harga: '$100',
-            uangMuka: '$20',
-            mataUang: 'IDR',
-            lamaHari: 7,
-            namaTourGuide: 'Tour Guide A',
-            tipePaket: 'Paket A',
-            jenis: 'Jenis A',
-            status: 'Aktif',
-            cabang: 'Cabang A',
-            pnr: 'PNR A',
-            pax: 2,
-            issued: 'Yes',
-            action: 'Action A',
-        },
-    ];
-    return (
-        <View style={styles.container}>
-            <ScrollView horizontal={true}>
-                <DataTable>
-                    <DataTable.Header style={styles.tableHeader}>
-                        <DataTable.Title><Text style={styles.shortColumnHeader}>No</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Nama Paket</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.shortColumnHeader}>Harga</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Uang Muka</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Mata Uang</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Lama Hari</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Nama Tour Guide</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Tipe Paket</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Jenis</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>Status</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.columnHeader}>CABANG</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.shortColumnHeader}>PNR</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.shortColumnHeader}>Pax</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.shortColumnHeader}>Issued</Text></DataTable.Title>
-                        <DataTable.Title><Text style={styles.shortColumnHeader}>Action</Text></DataTable.Title>
-                    </DataTable.Header>
+  const [currentPage, setCurrentPage] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
 
-                    {data.map((item, index) => (
-                        <DataTable.Row key={index}>
-                            <DataTable.Cell style={styles.shortCell}><Text>{item.no}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.namaPaket}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.harga}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.uangMuka}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.mataUang}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.lamaHari}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.namaTourGuide}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.tipePaket}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.jenis}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.status}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.cell}><Text>{item.cabang}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.shortCell}><Text>{item.pnr}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.shortCell}><Text>{item.pax}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.shortCell}><Text>{item.issued}</Text></DataTable.Cell>
-                            <DataTable.Cell style={styles.shortCell}><Text>{item.action}</Text></DataTable.Cell>
-                        </DataTable.Row>
-                    ))}
-                </DataTable>
-            </ScrollView>
+  // Handle perubahan jumlah baris per halaman
+  const changeItemsPerPage = (newPerPage) => {
+    setItemsPerPage(newPerPage);
+
+  };
+  const itemsPerPageOptions = ["5", "10", "20"];
+
+  // Calculate the start and end indexes for the current page
+  const startIndex = currentPage * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  // Slice the data to display only the rows for the current page
+  const pageData = data.slice(startIndex, endIndex);
+
+  // Function to handle page navigation
+  const handlePrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  return (
+        <ScrollView vertical={true} >
+    <View>
+      <View style={styles.head}>
+        <Text style={{ fontSize: 18, fontWeight: "bold", top: 4 }}>
+          Daftar Paket
+        </Text>
+      </View>
+      <View style={styles.card}>
+        <ScrollView horizontal={true} style={{ width: "auto" }}>
+          <View style={styles.container}>
+            {/* Search */}
+            <View style={styles.searchContainer}>
+              {/* Kotak Pencarian */}
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Cari Nama Paket"
+                autoFocus={false}
+              />
+             
+            </View>
+            <FlatList
+              data={pageData}
+              keyExtractor={(item) => item.id}
+              ListHeaderComponent={() => (
+                <View style={styles.Hrow}>
+                  <Text style={[styles.Hcell, styles.header, { width: 50 }]}>
+                    NO
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>
+                    NAMA PAKET
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header, { width: 70 }]}>
+                    HARGA
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>UANG MUKA</Text>
+                  <Text style={[styles.Hcell, styles.header]}>MATA UANG</Text>
+                  <Text style={[styles.Hcell, styles.header]}>LAMA HARI	</Text>
+                  <Text style={[styles.Hcell, styles.header, { width: 120 }]}>NAMA TOUR GUIDE</Text>
+                  <Text style={[styles.Hcell, styles.header]}>
+                  TIPE PAKET
+                  </Text>
+                  <Text style={[styles.Hcell, styles.header]}>JENIS	</Text>
+                  <Text style={[styles.Hcell, styles.header]}>STATUS</Text>
+                  <Text style={[styles.Hcell, styles.header]}>CABANG</Text>
+                  <Text style={[styles.Hcell, styles.header, { width: 50 }]}>PAX</Text>
+                  <Text style={[styles.Hcell, styles.header, { width: 90 }]}>DAFTAR</Text>
+                  {/* <Text style={[styles.Hcell, styles.header]}>ACTION</Text> */}
+                </View>
+              )}
+              renderItem={({ item }) => (
+                <View style={styles.row}>
+                  <Text style={[styles.cell, { width: 50, textAlign: "left" }]}>
+                    {item.no}
+                  </Text>
+                  <Text style={[styles.cell, { width: 100 }]}>{item.namaPaket}</Text>
+                  <Text style={[styles.cell,{ width: 70 }]}>{item.harga}</Text>
+                  <Text style={styles.cell}>{item.uangMuka}</Text>
+                  <Text style={styles.cell}>{item.mataUang}</Text>
+                  <Text style={[styles.cell, { width: 80 }]}>{item.lamaHari}</Text>
+                  <Text style={[styles.cell, { width: 120 }]}>{item.namaTourGuide}</Text>
+                  <Text style={[styles.cell, { width: 95 }]}>
+                    {item.tipePaket}
+                  </Text>
+                  <Text style={[styles.cell]}>
+                    {item.jenis}
+                  </Text>
+                  <Text style={[styles.cell, { width: 90 }]}>
+                    {item.status}
+                  </Text>
+                  <Text style={[styles.cell, { width: 105 }]}>
+                    {item.cabang}
+                  </Text>
+                  <Text style={[styles.cell, { width: 50 }]}>
+                    {item.pax}
+                  </Text>
+                  <Text style={[styles.cell, { width: 70 }]}>
+                    {item.issued}
+                  </Text>
+                  {/* <Text style={styles.cell}>
+                    <View style={styles.iconContainer}>
+                      <FontAwesome5
+                        name="pencil-alt"
+                        size={15}
+                        color="#870144"
+                        style={{ marginRight: 1 }}
+                      />
+                      <Feather
+                        name="printer"
+                        size={15}
+                        color="#870144"
+                        style={{ marginRight: 1 }}
+                      />
+                      <MaterialCommunityIcons
+                        name="credit-card-check-outline"
+                        size={15}
+                        color="#870144"
+                      />
+                    </View>
+                  </Text> */}
+                </View>
+              )}
+            />
+          </View>
+        </ScrollView>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            margin: 8,
+          }}
+        >
+          <View style={styles.iconContainer}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex",
+                alignItems: "center",
+                height: 30,
+              }}
+            >
+              <Text>Rows per page</Text>
+              <Text style={{ marginHorizontal: 5 }}>
+                <SelectDropdown
+                  data={itemsPerPageOptions}
+                  onSelect={(selectedItem, index) => {
+                    changeItemsPerPage(parseInt(selectedItem));
+                  }}
+                  buttonTextAfterSelection={(selectedItem, index) => {
+                    return selectedItem;
+                  }}
+                  rowTextForSelection={(item, index) => {
+                    return item;
+                  }}
+                  defaultButtonText={itemsPerPage} // Text pada tombol dropdown
+                  buttonStyle={{
+                    height: 32,
+                    backgroundColor: "#fff",
+                    borderRadius: 5,
+                    width: 48,
+                    elevation: 2,
+                  }}
+                  buttonTextStyle={{ fontSize: 12 }}
+                  renderDropdownIcon={() => (
+                    <Text style={{ fontSize: 13 }}>▼</Text>
+                  )}
+                  dropdownTextStyle={{ fontSize: 20 }}
+                  dropdownTextHighlightStyle={{ backgroundColor: "#6E759F" }}
+                />
+              </Text>
+            </View>
+
+            <Button
+              title="<"
+              onPress={handlePrevPage}
+              buttonStyle={{ height: 5 }}
+              color="#6E759F"
+              disabled={currentPage === 0}
+            />
+            <Button
+              title=">"
+              onPress={handleNextPage}
+              buttonStyle={{ height: 5 }}
+              color="#870144"
+              disabled={
+                currentPage === Math.ceil(data.length / itemsPerPage) - 1
+              }
+            />
+          </View>
         </View>
-    )
+      </View>
+    </View>
+      </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#fff',
-    },
-    tableHeader: {
-        backgroundColor: '#870144', // Warna latar belakang tabel head
-    },
-    columnHeader: {
-        width: 100,
-        marginHorizontal: 8,
-        fontWeight: 'bold',
-        color: "white",
-    },
-    shortColumnHeader: {
-        width: 60,
-        marginHorizontal: 8,
-        fontWeight: 'bold',
-        color: "white",
-    },
-    cell: {
-        width: 100,
-        marginHorizontal: 8,
-    },
-    shortCell: {
-        width: 60,
-        marginHorizontal: 8,
-    },
-    tableRow: {
-        borderBottomWidth: 1, // Garis pemisah antar baris
-        borderBottomColor: '#e0e0e0', // Warna garis pemisah
-    },
+  container: {
+    // flex: 1,
+    flex: 1,
+    marginTop: 18,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+    justifyContent: "space-between",
+  },
+  Hrow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "left",
+    padding: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  Hcell: {
+    flex: 1,
+    padding: 30,
+    paddingHorizontal: 15,
+    textAlign: "left",
+    backgroundColor: "#870144",
+    color: "#fff",
+  },
+  header: {
+    fontWeight: "bold",
+    padding: 12,
+    width: 100,
+  },
+  cell: {
+    flex: 1,
+    padding: 3,
+    textAlign: "left",
+    paddingHorizontal: 10,
+    fontSize: 15,
+    width: 100,
+  },
+  card: {
+    backgroundColor: "white",
+    elevation: 4, // Efek shadow kartu
+    marginHorizontal: 10,
+    marginVertical:10,
+    padding: 0,
+    borderRadius: 4,
+    //   paddingBottom:10
+  },
+  searchInput: {
+    height: 30,
+    width: 200,
+    borderColor: "gray",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginLeft: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  iconContainer: {
+    flexDirection: "row",
+    marginLeft: 10,
+  },
+  icons: {
+    padding: 10,
+  },
+  iconAction: {
+    flexDirection: "row",
+  },
+  head: {
+    margin: 20,
+    fontWeight: "bold",
+    fontSize: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#870144",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
 });

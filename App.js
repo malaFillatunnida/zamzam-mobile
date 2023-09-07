@@ -6,6 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen.js";
 import Login from "./screens/Login.js";
+import Tambah_jamaah from "./screens/Jamaah/Tambah_jamaah.js";
 
 
 
@@ -26,6 +27,17 @@ export default function App() {
           name="Home"
           component={HomeScreen}
           options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="Tambah Jamaah"
+          component={Tambah_jamaah}
+          options={{
+            headerStyle: {
+              backgroundColor: "#870144",
+            },
+            headerTintColor: "white",
+          }}
         />
 
       </Stack.Navigator>

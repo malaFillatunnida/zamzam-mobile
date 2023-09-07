@@ -133,7 +133,7 @@ const data = [
 
 const itemsPerPage = 2; // Number of rows per page
 
-export default function Kafalah() {
+export default function Jamaah({ navigation }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
 
@@ -164,7 +164,13 @@ export default function Kafalah() {
       setCurrentPage(currentPage + 1);
     }
   };
+
   const buttonColor = "#870144";
+
+  const gotoAddJamaah = () => {
+    navigation.navigate("Tambah Jamaah");
+  };
+
   return (
     <View>
       <View style={styles.head}>
@@ -172,7 +178,7 @@ export default function Kafalah() {
           Daftar Jamaah
         </Text>
         <TouchableOpacity
-          // onPress={}
+          onPress={gotoAddJamaah}
           style={styles.buttonContainer}
         >
           <View>
@@ -261,13 +267,13 @@ export default function Kafalah() {
                         name="pencil-alt"
                         size={15}
                         color="#870144"
-                        style={{ marginRight: 1 }}
+                        style={{ marginRight: 5 }}
                       />
                       <Feather
                         name="printer"
                         size={15}
                         color="#870144"
-                        style={{ marginRight: 1 }}
+                        style={{ marginRight: 5 }}
                       />
                       <MaterialCommunityIcons
                         name="credit-card-check-outline"
@@ -346,7 +352,7 @@ export default function Kafalah() {
               }
             />
           </View>
-          </View>
+        </View>
       </View>
     </View>
   );

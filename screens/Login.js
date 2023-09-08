@@ -45,7 +45,16 @@ export default function Login({ navigation }) {
     return (
         <View style={styles.container}>
             <Image style={styles.image} source={require("../assets/login.png")} />
-            <Text style={styles.welcome}>Login your Account.</Text>
+            <Text style={styles.welcome}>
+                Retali Travel Umroh <Text style={{ color: "yellow" }}>Sesuai Sunnah</Text>
+            </Text>
+            <Text style={styles.zamzam}>
+                ZAMZAM v2.2.0
+            </Text>
+            <Text style={styles.version}>
+                Current build version 83
+                Latest build on
+            </Text>
 
             <View style={styles.inputView}>
                 <TextInput
@@ -53,6 +62,7 @@ export default function Login({ navigation }) {
                     onChangeText={setUsername}
                     value={username}
                     placeholder="Username."
+                    selectionColor="#870144"
                 />
             </View>
 
@@ -63,6 +73,7 @@ export default function Login({ navigation }) {
                     value={password}
                     secureTextEntry={true}
                     placeholder="Password."
+                    selectionColor="#870144"
                 />
             </View>
             {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
@@ -78,7 +89,7 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "black",
         alignItems: "center",
         justifyContent: "center",
     },
@@ -89,13 +100,25 @@ const styles = StyleSheet.create({
     },
 
     welcome: {
-        color: "#870144",
-        fontSize: 22,
-        marginBottom: 40,
+        color: "white",
+        fontSize: 26,
+        marginBottom: 20,
+        fontWeight: 'bold',
+        paddingHorizontal: 20,
+        textAlign: 'center'
+    },
+
+    zamzam: {
+        color: 'white'
+    },
+
+    version: {
+        color: 'white',
+        marginBottom: 20,
     },
 
     inputView: {
-        backgroundColor: "#2222",
+        backgroundColor: "white",
         borderRadius: 5,
         width: "80%",
         height: 50,
@@ -119,7 +142,6 @@ const styles = StyleSheet.create({
         height: 50,
         alignItems: "center",
         justifyContent: "center",
-        marginTop: 20,
         borderRadius: 5,
         backgroundColor: "#870144",
     },
@@ -133,5 +155,6 @@ const styles = StyleSheet.create({
     errorMessage: {
         color: "red",
         fontWeight: 'bold',
+        marginBottom: 18
     },
 });

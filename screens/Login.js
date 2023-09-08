@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     Alert,
 } from "react-native";
+import { storeData } from "../Util";
 
 export default function Login({ navigation }) {
     const [username, setUsername] = useState("");
@@ -17,28 +18,31 @@ export default function Login({ navigation }) {
 
     const login = async () => {
         if (!username || !password) {
-            setErrorMessage("* Username and password cannot be empty!");
+            setErrorMessage("* Username dan password tidak boleh kosong!");
             return;
         }
 
         try {
-            const { data, status } = await axios.post(`http://192.168.137.73:8081/users/login`, {
+            const { data, status } = await axios.post(`http://192.168.177.72:9000/users/login`, {
                 username: username,
                 password: password,
             });
 
             if (status === 200) {
-                localStorage.setItem('token', data.token);
-                // console.log(data.token);
-                navigation.navigate("HomeScreen");
+                // Simpan token ke penyimpanan lokal
+                await storeData("access_token", data.access_token);
+
+                // Cetak token ke konsol
+                console.log(data.access_token);
+
+                navigation.navigate("Home");
 
             } else {
                 throw new Error("Login bermasalah");
             }
         } catch (err) {
             console.log(err);
-            // Alert.alert("Error login");
-            setErrorMessage("Error login");
+            setErrorMessage("Username dan password salah!");
         }
     };
 

@@ -17,130 +17,23 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons/build/Icons";
 import SelectDropdown from "react-native-select-dropdown";
+import { getStoreData } from "../../util/util.js";
+import { instance as axios } from "../../util/api.js";
 
-const data = [
-  {
-    id: "1",
-    name: "Faza Sania",
-    jekel: "Perempuan",
-    paket: "Paket 1",
-    phoneNumber: "123456789",
-    partner: "Mitra 1",
-    cabang: "Cabang Jakarta",
-    voucherCode: "ABC123",
-    status: "Active",
-  },
-  {
-    id: "2",
-    name: "Mala Fillatunnida",
-    jekel: "Perempuan",
-    paket: "Paket 2",
-    phoneNumber: "987654321",
-    partner: "Mitra 2",
-    cabang: "Cabang Jakarta",
-    voucherCode: "XYZ789",
-    status: "Inactive",
-  },
-  {
-    id: "3",
-    name: "Kamilia Qotrunnada",
-    jekel: "Perempuan",
-    paket: "Paket 3",
-    phoneNumber: "555555555",
-    partner: "Mitra 3",
-    cabang: "Cabang Jakarta",
-    voucherCode: "DEF456",
-    status: "Active",
-  },
-  {
-    id: "4",
-    name: "Riska Amelia",
-    jekel: "Perempuan",
-    paket: "Paket 4",
-    phoneNumber: "111111111",
-    partner: "Nurjana Wahidudin",
-    cabang: "Cabang Jakarta",
-    voucherCode: "GHI789",
-    status: "Inactive",
-  },
-  {
-    id: "5",
-    name: "Aveecena ",
-    jekel: "Laki",
-    paket: "Paket 5",
-    phoneNumber: "999999999",
-    partner: "Syahla Azifatul 5",
-    cabang: "Cabang Jakarta",
-    voucherCode: "JKL123",
-    status: "Active",
-  },
-  {
-    id: "6",
-    name: "Aveecena ",
-    jekel: "Laki",
-    paket: "Paket 5",
-    phoneNumber: "999999999",
-    partner: "Syahla Azifatul 5",
-    cabang: "Cabang Jakarta",
-    voucherCode: "JKL123",
-    status: "Active",
-  },
-  {
-    id: "7",
-    name: "Aveecena ",
-    jekel: "Laki",
-    paket: "Paket 5",
-    phoneNumber: "999999999",
-    partner: "Syahla Azifatul 5",
-    cabang: "Cabang Jakarta",
-    voucherCode: "JKL123",
-    status: "Active",
-  },
-  {
-    id: "8",
-    name: "Aveecena ",
-    jekel: "Laki",
-    paket: "Paket 5",
-    phoneNumber: "999999999",
-    partner: "Syahla Azifatul 5",
-    cabang: "Cabang Jakarta",
-    voucherCode: "JKL123",
-    status: "Active",
-  },
-  {
-    id: "9",
-    name: "Aveecena ",
-    jekel: "Laki",
-    paket: "Paket 5",
-    phoneNumber: "999999999",
-    partner: "Syahla Azifatul 5",
-    cabang: "Cabang Jakarta",
-    voucherCode: "JKL123",
-    status: "Active",
-  },
-  {
-    id: "10",
-    name: "Aveecena ",
-    jekel: "Laki",
-    paket: "Paket 5",
-    phoneNumber: "999999999",
-    partner: "Syahla Azifatul 5",
-    cabang: "Cabang Jakarta",
-    voucherCode: "JKL123",
-    status: "Active",
-  },
-];
-
-const itemsPerPage = 2; // Number of rows per page
 
 export default function Jamaah({ navigation }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
+  const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage);
+  // customers
+  const [customerData, setCustomerData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
 
   // Handle perubahan jumlah baris per halaman
   const changeItemsPerPage = (newPerPage) => {
-    setItemsPerPage(newPerPage);
-
+  setSelectedItemsPerPage(newPerPage); // Perbarui selectedItemsPerPage
+  setItemsPerPage(newPerPage); // Perbarui itemsPerPage
   };
   const itemsPerPageOptions = ["5", "10", "20"];
 
@@ -148,8 +41,8 @@ export default function Jamaah({ navigation }) {
   const startIndex = currentPage * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  // Slice the data to display only the rows for the current page
-  const pageData = data.slice(startIndex, endIndex);
+  // Slice the customerData to display only the rows for the current page
+  const pageData = customerData.slice(startIndex, endIndex);
 
   // Function to handle page navigation
   const handlePrevPage = () => {
@@ -157,23 +50,46 @@ export default function Jamaah({ navigation }) {
       setCurrentPage(currentPage - 1);
     }
   };
-
   const handleNextPage = () => {
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const totalPages = Math.ceil(customerData.length / itemsPerPage);
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
-
-  const buttonColor = "#870144";
-
   const gotoAddJamaah = () => {
     navigation.navigate("Tambah Jamaah");
   };
-
   const gotoEditJamaah = () => {
     navigation.navigate("Edit Jamaah");
   };
+
+
+  // Fungsi untuk mengambil data dengan token dari AsyncStorage
+  const fetchData = async () => {
+    try {
+
+      // Mengirim permintaan GET dengan Axios
+      const response = await axios.get('/customers', {
+        headers: {
+          Authorization: `Bearer ${await getStoreData("access_token")}`,
+        },
+      });
+
+      // Menggunakan data dari response
+      setCustomerData(response.data);
+      // console.log(response.data);
+      setLoading(false);
+    } catch (error) {
+      // Handle error dengan benar
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+
 
   return (
     <View>
@@ -248,22 +164,24 @@ export default function Jamaah({ navigation }) {
                   <Text style={[styles.Hcell, styles.header]}>ACTION</Text>
                 </View>
               )}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
                 <View style={styles.row}>
-                  <Text style={[styles.cell, { width: 40, textAlign: "left" }]}>
-                    {item.id}
+                  <Text style={[styles.cell, { width: 35, textAlign: "left" }]}>
+                  {index + 1}
                   </Text>
-                  <Text style={[styles.cell, { width: 100 }]}>{item.name}</Text>
-                  <Text style={styles.cell}>{item.jekel}</Text>
-                  <Text style={styles.cell}>{item.paket}</Text>
-                  <Text style={[styles.cell, { width: 95 }]}>{item.phoneNumber}</Text>
-                  <Text style={styles.cell}>{item.partner}</Text>
-                  <Text style={styles.cell}>{item.cabang}</Text>
+                  <Text style={[styles.cell, { width: 95, fontWeight: "bold"}]}>{item.fullName}</Text>
+                  <Text style={styles.cell}>
+                  {item.gender ? "Perempuan" : "Laki-laki"}
+                  </Text>
+                  <Text style={styles.cell}>{item.productName}</Text>
+                  <Text style={[styles.cell, { width: 95 }]}>{item.mobileNo}</Text>
+                  <Text style={styles.cell}>{item.partnerName}</Text>
+                  <Text style={styles.cell}>{item.branchName}</Text>
                   <Text style={[styles.cell, { width: 95 }]}>
                     {item.voucherCode}
                   </Text>
                   <Text style={[styles.cell, { width: 88 }]}>
-                    {item.status}
+                    {item.customerStatus}
                   </Text>
                   <Text style={styles.cell}>
                     <View style={styles.iconContainer}>
@@ -323,19 +241,15 @@ export default function Jamaah({ navigation }) {
                   rowTextForSelection={(item, index) => {
                     return item;
                   }}
-                  defaultButtonText={itemsPerPage} // Text pada tombol dropdown
-                  buttonStyle={{
-                    height: 32,
-                    backgroundColor: "#fff",
-                    borderRadius: 5,
-                    width: 48,
-                    elevation: 2,
-                  }}
-                  buttonTextStyle={{ fontSize: 12 }}
+                  // defaultButtonText={itemsPerPage} // Text pada tombol dropdown
+                  defaultButtonText={selectedItemsPerPage.toString()} // Ubah itemsPerPage menjadi selectedItemsPerPage
+
+                  buttonStyle={styles.buttonPage}
+                  buttonTextStyle={{ fontSize: 13}}
                   renderDropdownIcon={() => (
                     <Text style={{ fontSize: 13 }}>▼</Text>
                   )}
-                  dropdownTextStyle={{ fontSize: 20 }}
+                  dropdownTextStyle={{ fontSize: 15   }}
                   dropdownTextHighlightStyle={{ backgroundColor: "#6E759F" }}
                 />
               </Text>
@@ -344,17 +258,17 @@ export default function Jamaah({ navigation }) {
             <Button
               title="<"
               onPress={handlePrevPage}
-              buttonStyle={{ height: 5 }}
+              // buttonStyle={{ height: 5 }}
               color="#6E759F"
               disabled={currentPage === 0}
             />
             <Button
               title=">"
               onPress={handleNextPage}
-              buttonStyle={{ height: 5 }}
+              // buttonStyle={{ height: 5 }}
               color="#870144"
               disabled={
-                currentPage === Math.ceil(data.length / itemsPerPage) - 1
+                currentPage === Math.ceil(cus.length / itemsPerPage) - 1
               }
             />
           </View>
@@ -458,5 +372,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
+  },
+  buttonPage: {
+    height: 32,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    width: 55,
+    elevation: 2
   },
 });

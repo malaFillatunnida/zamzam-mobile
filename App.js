@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-// import { Provider } from "react-redux";
-// import store from "./store";
+import { Provider } from "react-redux";
+import store from "./store/store.js";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -17,7 +17,7 @@ export default function App() {
   return (
     // <Provider store={store}>
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Tambah_jamaah">
         <Stack.Screen
           name="Login"
           component={Login}

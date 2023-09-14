@@ -1,27 +1,109 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { getStoreData } from '../../util/util';
+import { instance as axios } from '../../util/api';
 
-export default function Tambah_jamaah({ tambahJamaah }) {
+export default function Tambah_jamaah({ navigation }) {
+    const [partnerData, setPartnerData] = useState([]);
+    const [paketData, setPaketData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
     const [nama, setNama] = useState('');
     const [nik, setNik] = useState('');
     const [noTelepon, setNoTelepon] = useState('');
     const [selectedPaket, setSelectedPaket] = useState('');
     const [selectedMitra, setSelectedMitra] = useState('');
+    // const branch_id = partnerData.branchId
+    const branch_id = partnerData.map((partner) => partner.branchId).toString();
+    console.log("Branch IDs:", branch_id);
 
-    const handleSubmit = () => {
-        if (!nama || !nik || !noTelepon || !selectedPaket) {
-            alert('Ada field yang wajid di isi!');
-            return;
+    // add jamaah
+    const tambahJamaah = async () => {
+      try {
+        const formData = {
+            icNo: nik,
+            mobileNo: noTelepon,
+            fullName: nama,
+            productId: selectedPaket,
+            partnerId: selectedMitra,
+            branchId: branch_id, // Isi dengan ID cabang yang sesuai
+            gender: true,
+            wni: true
+          };
+          
+        console.log("ini form data", formData);
+        
+        await axios.post(`/customers`, formData, {
+            headers: {
+                Authorization: `Bearer ${await getStoreData("access_token")}`,
+            },
+        });
+        Alert.alert("Jamaah successfully added");
+        navigation.navigate("Home");
+    } catch (err) {
+        console.log(err);
+    }
+};
+
+    // fetch partners
+    const fetchPartners = async () => {
+        try {
+    
+          // Mengirim permintaan GET dengan Axios
+          const response = await axios.get('/partners', {
+            headers: {
+              Authorization: `Bearer ${await getStoreData("access_token")}`,
+            },
+          });
+    
+          // Menggunakan data dari response
+          setPartnerData(response.data);
+          console.log("ni resone data",response.data);
+          setLoading(false);
+        } catch (error) {
+          // Handle error dengan benar
+          console.error('Error fetching data:', error);
         }
+      };
+    
+    // fetch paket
+    const fetchDataPaket = async () => {
+        try {
+    
+          // Mengirim permintaan GET dengan Axios
+          const response = await axios.get('/products', {
+            headers: {
+              Authorization: `Bearer ${await getStoreData("access_token")}`,
+            },
+          });
+    
+          // Menggunakan data dari response
+          setPaketData(response.data);
+          // console.log(response.data);
+          setLoading(false);
+        } catch (error) {
+          // Handle error dengan benar
+          console.error('Error fetching data:', error);
+        }
+      };
+    
+      useEffect(() => {
+        fetchPartners();
+        fetchDataPaket();
+      }, []);
 
-        tambahJamaah({ nama, nik, noTelepon, paket: selectedPaket, mitra: selectedMitra });
-
-        setNama('');
-        setNik('');
-        setNoTelepon('');
-        setSelectedPaket('');
-        setSelectedMitra('');
+const handleSubmit = () => {
+    if (!nama || !nik || !noTelepon || !selectedPaket) {
+        alert('Ada field yang wajib diisi!');
+        return;
+      }
+      tambahJamaah();
+      setNama('');
+      setNik('');
+      setNoTelepon('');
+      setSelectedPaket('');
+      setSelectedMitra('');
     };
 
     return (
@@ -62,12 +144,39 @@ export default function Tambah_jamaah({ tambahJamaah }) {
                     style={styles.pickerItemStyle}
                 >
                     <Picker.Item style={styles.pickerItemPilih} label="Pilih Paket " value="" />
-                    <Picker.Item style={styles.pickerItemStyle} label="Paket A" value="Paket A" />
-                    <Picker.Item style={styles.pickerItemStyle} label="Paket B" value="Paket B" />
-                    <Picker.Item style={styles.pickerItemStyle} label="Paket C" value="Paket C" />
+                    {paketData.map((product) => (
+                        <Picker.Item
+                            key={product.id}
+                            style={styles.pickerItemStyle}
+                            label={product.productName}
+                            value={product.id}
+                        />
+                    ))}
                 </Picker>
             </View>
             <Text>Mitra</Text>
+            <View style={styles.inputOption}>
+                {loading ? (
+                    <Text>Loading...</Text> // Tampilkan pesan loading selama data dimuat
+                ) : (
+                    <Picker
+                        selectedValue={selectedMitra}
+                        onValueChange={(itemValue, itemIndex) => setSelectedMitra(itemValue)}
+                        style={styles.pickerItemStyle}
+                    >
+                        <Picker.Item style={styles.pickerItemPilih} label="Pilih Mitra" value="" />
+                        {partnerData.map((partner) => (
+                            <Picker.Item
+                                key={partner.id}
+                                style={styles.pickerItemStyle}
+                                label={partner.fullName}
+                                value={partner.id}
+                            />
+                        ))}
+                    </Picker>
+                )}
+            </View>
+            {/* <Text>Mitra</Text>
             <View style={styles.inputOption}>
                 <Picker
                     selectedValue={selectedMitra}
@@ -79,7 +188,7 @@ export default function Tambah_jamaah({ tambahJamaah }) {
                     <Picker.Item style={styles.pickerItemStyle} label="Mitra B" value="Mitra B" />
                     <Picker.Item style={styles.pickerItemStyle} label="Mitra C" value="Mitra C" />
                 </Picker>
-            </View>
+            </View> */}
             <TouchableOpacity
                 style={styles.submitButton}
                 onPress={handleSubmit}
@@ -127,7 +236,7 @@ const styles = StyleSheet.create({
         lineHeight: 48
     },
     pickerItemPilih: {
-        fontSize: 14,
+        fontSize: 18,
         color: '#bbb',
     },
     pickerItemStyle: {

@@ -268,7 +268,7 @@ export default function Jamaah({ navigation }) {
               // buttonStyle={{ height: 5 }}
               color="#870144"
               disabled={
-                currentPage === Math.ceil(cus.length / itemsPerPage) - 1
+                currentPage === Math.ceil(customerData.length / itemsPerPage) - 1
               }
             />
           </View>

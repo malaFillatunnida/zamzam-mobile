@@ -1,5 +1,5 @@
-import { StatusBar, StyleSheet, View } from "react-native";
-import React from "react";
+import { BackHandler, StatusBar, StyleSheet, View } from "react-native";
+import React, { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   AntDesign,
@@ -16,6 +16,12 @@ import Paket from "./paket/Paket.js";
 const Tab = createBottomTabNavigator();
 
 export default function HomeScreen() {
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", () => {
+      return true;
+    })
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar />

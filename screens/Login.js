@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useState } from "react";
 import {
     StyleSheet,
@@ -6,10 +5,10 @@ import {
     View,
     Image,
     TextInput,
-    TouchableOpacity,
-    Alert,
+    TouchableOpacity
 } from "react-native";
-import { storeData } from "../Util";
+import { storeData } from "../util/util";
+import { instance as axios } from "../util/api";
 
 export default function Login({ navigation }) {
     const [username, setUsername] = useState("");
@@ -23,20 +22,14 @@ export default function Login({ navigation }) {
         }
 
         try {
-            const { data, status } = await axios.post(`http://192.168.177.72:9000/users/login`, {
+            const { data, status } = await axios.post(`/users/login`, {
                 username: username,
                 password: password,
             });
 
             if (status === 200) {
-                // Simpan token ke penyimpanan lokal
                 await storeData("access_token", data.access_token);
-
-                // Cetak token ke konsol
-                console.log(data.access_token);
-
                 navigation.navigate("Home");
-
             } else {
                 throw new Error("Login bermasalah");
             }

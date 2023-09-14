@@ -18,65 +18,16 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons/build/Icons";
 import SelectDropdown from "react-native-select-dropdown";
-
-const data = [ 
-  { 
-      no: 1, 
-      namaPaket: 'Wisata A', 
-      harga: '$100', 
-      uangMuka: '$20', 
-      mataUang: 'IDR', 
-      lamaHari: 7, 
-      namaTourGuide: 'Tour Guide A', 
-      tipePaket: 'Paket A', 
-      jenis: 'Jenis A', 
-      status: 'Aktif', 
-      cabang: 'Cabang A', 
-      pnr: 'PNR A', 
-      pax: 2, 
-      issued: 'Yes', 
-      action: 'Action A', 
-  }, 
-  { 
-      no: 2, 
-      namaPaket: 'Wisata B', 
-      harga: '$120', 
-      uangMuka: '$20', 
-      mataUang: 'IDR', 
-      lamaHari: 7, 
-      namaTourGuide: 'Tour Guide A', 
-      tipePaket: 'Paket A', 
-      jenis: 'Jenis A', 
-      status: 'Aktif', 
-      cabang: 'Cabang A', 
-      pnr: 'PNR A', 
-      pax: 2, 
-      issued: 'Yes', 
-      action: 'Action A', 
-  }, 
-  { 
-      no: 3, 
-      namaPaket: 'Wisata C', 
-      harga: '$130', 
-      uangMuka: '$20', 
-      mataUang: 'IDR', 
-      lamaHari: 7, 
-      namaTourGuide: 'Tour Guide A', 
-      tipePaket: 'Paket A', 
-      jenis: 'Jenis A', 
-      status: 'Aktif', 
-      cabang: 'Cabang A', 
-      pnr: 'PNR A', 
-      pax: 2, 
-      issued: 'Yes', 
-      action: 'Action A', 
-  }, 
-];
-
+import { getStoreData } from "../../util/util";
+import { instance as axios } from "../../util/api";
 
 export default function Paket() {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
+
+  // Paket
+  const [paketData, setPaketData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Handle perubahan jumlah baris per halaman
   const changeItemsPerPage = (newPerPage) => {
@@ -90,7 +41,7 @@ export default function Paket() {
   const endIndex = startIndex + itemsPerPage;
 
   // Slice the data to display only the rows for the current page
-  const pageData = data.slice(startIndex, endIndex);
+  const pageData = paketData.slice(startIndex, endIndex);
 
   // Function to handle page navigation
   const handlePrevPage = () => {
@@ -100,11 +51,36 @@ export default function Paket() {
   };
 
   const handleNextPage = () => {
-    const totalPages = Math.ceil(data.length / itemsPerPage);
+    const totalPages = Math.ceil(paketData.length / itemsPerPage);
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
+
+  const fetchDataPaket = async () => {
+    try {
+
+      // Mengirim permintaan GET dengan Axios
+      const response = await axios.get('/products', {
+        headers: {
+          Authorization: `Bearer ${await getStoreData("access_token")}`,
+        },
+      });
+
+      // Menggunakan data dari response
+      setPaketData(response.data);
+      // console.log(response.data);
+      setLoading(false);
+    } catch (error) {
+      // Handle error dengan benar
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataPaket();
+  }, []);
+
 
   return (
         <ScrollView vertical={true} >
@@ -129,7 +105,7 @@ export default function Paket() {
             </View>
             <FlatList
               data={pageData}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.id.toString()}
               ListHeaderComponent={() => (
                 <View style={styles.Hrow}>
                   <Text style={[styles.Hcell, styles.header, { width: 50 }]}>
@@ -156,19 +132,19 @@ export default function Paket() {
                   {/* <Text style={[styles.Hcell, styles.header]}>ACTION</Text> */}
                 </View>
               )}
-              renderItem={({ item }) => (
+              renderItem={({ item, index}) => (
                 <View style={styles.row}>
-                  <Text style={[styles.cell, { width: 50, textAlign: "left" }]}>
-                    {item.no}
+                  <Text style={[styles.cell, { width: 40, textAlign: "left" }]}>
+                    {index + 1}
                   </Text>
-                  <Text style={[styles.cell, { width: 100 }]}>{item.namaPaket}</Text>
-                  <Text style={[styles.cell,{ width: 70 }]}>{item.harga}</Text>
-                  <Text style={styles.cell}>{item.uangMuka}</Text>
-                  <Text style={styles.cell}>{item.mataUang}</Text>
-                  <Text style={[styles.cell, { width: 80 }]}>{item.lamaHari}</Text>
-                  <Text style={[styles.cell, { width: 120 }]}>{item.namaTourGuide}</Text>
+                  <Text style={[styles.cell, { width: 100 }]}>{item.productName}</Text>
+                  <Text style={[styles.cell,{ width: 70 }]}>{item.price}</Text>
+                  <Text style={styles.cell}>{item.downPayment}</Text>
+                  <Text style={styles.cell}>{item.currency}</Text>
+                  <Text style={[styles.cell, { width: 80 }]}>{item.lengthOfJourney}</Text>
+                  <Text style={[styles.cell, { width: 120 }]}>{item.lengthOfJourney}</Text>
                   <Text style={[styles.cell, { width: 95 }]}>
-                    {item.tipePaket}
+                    {item.productType.typeName}
                   </Text>
                   <Text style={[styles.cell]}>
                     {item.jenis}
@@ -177,7 +153,7 @@ export default function Paket() {
                     {item.status}
                   </Text>
                   <Text style={[styles.cell, { width: 105 }]}>
-                    {item.cabang}
+                    {item.branch.name}
                   </Text>
                   <Text style={[styles.cell, { width: 50 }]}>
                     {item.pax}
@@ -272,7 +248,7 @@ export default function Paket() {
               buttonStyle={{ height: 5 }}
               color="#870144"
               disabled={
-                currentPage === Math.ceil(data.length / itemsPerPage) - 1
+                currentPage === Math.ceil(paketData.length / itemsPerPage) - 1
               }
             />
           </View>

@@ -8,8 +8,7 @@ import HomeScreen from "./screens/HomeScreen.js";
 import Login from "./screens/Login.js";
 import Tambah_jamaah from "./screens/Jamaah/Tambah_jamaah.js";
 import Edit_jamaah from "./screens/Jamaah/Edit_jamaah.js";
-
-
+import UploadDetail from "./screens/Jamaah/UploadDetail.js";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +43,17 @@ export default function App() {
         <Stack.Screen
           name="Edit Jamaah"
           component={Edit_jamaah}
+          options={{
+            headerStyle: {
+              backgroundColor: "#870144",
+            },
+            headerTintColor: "white",
+          }}
+        />
+
+        <Stack.Screen
+          name="Upload Detail"
+          component={UploadDetail}
           options={{
             headerStyle: {
               backgroundColor: "#870144",

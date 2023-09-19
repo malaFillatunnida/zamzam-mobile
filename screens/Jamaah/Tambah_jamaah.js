@@ -15,6 +15,8 @@ export default function Tambah_jamaah({ navigation }) {
     const [selectedPaket, setSelectedPaket] = useState('');
     const [selectedMitra, setSelectedMitra] = useState('');
     const branch_id = partnerData.map((partner) => partner.branchId).toString();
+    const [customerAdded, setCustomerAdded] = useState(false);
+
 
     // add jamaah
     const tambahJamaah = async () => {
@@ -37,6 +39,7 @@ export default function Tambah_jamaah({ navigation }) {
                 Authorization: `Bearer ${await getStoreData("access_token")}`,
             },
         });
+        setCustomerAdded(true); 
         Alert.alert("Jamaah successfully added");
         navigation.navigate("Home");
     } catch (err) {
@@ -90,6 +93,16 @@ export default function Tambah_jamaah({ navigation }) {
         fetchDataPaket();
       }, []);
 
+      const handleReset = () => {
+        setCustomerAdded(false);
+        setNama('');
+        setNik('');
+        setNoTelepon('');
+        setSelectedPaket('');
+        setSelectedMitra('');
+      };
+      
+
 const handleSubmit = () => {
     if (!nama || !nik || !noTelepon || !selectedPaket) {
         alert('Ada field yang wajib diisi!');
@@ -104,16 +117,13 @@ const handleSubmit = () => {
     }
 
       tambahJamaah();
-      setNama('');
-      setNik('');
-      setNoTelepon('');
-      setSelectedPaket('');
-      setSelectedMitra('');
+      handleReset();
 
     };
 
     return (
         <View style={styles.container}>
+         
             <Text style={styles.dataPribadi}>Data Pribadi</Text>
             <Text>Nama sesuai NIK *</Text>
             <TextInput

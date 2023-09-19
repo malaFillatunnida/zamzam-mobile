@@ -14,9 +14,7 @@ export default function Tambah_jamaah({ navigation }) {
     const [noTelepon, setNoTelepon] = useState('');
     const [selectedPaket, setSelectedPaket] = useState('');
     const [selectedMitra, setSelectedMitra] = useState('');
-    // const branch_id = partnerData.branchId
     const branch_id = partnerData.map((partner) => partner.branchId).toString();
-    console.log("Branch IDs:", branch_id);
 
     // add jamaah
     const tambahJamaah = async () => {
@@ -59,7 +57,6 @@ export default function Tambah_jamaah({ navigation }) {
     
           // Menggunakan data dari response
           setPartnerData(response.data);
-          console.log("ni resone data",response.data);
           setLoading(false);
         } catch (error) {
           // Handle error dengan benar
@@ -96,14 +93,23 @@ export default function Tambah_jamaah({ navigation }) {
 const handleSubmit = () => {
     if (!nama || !nik || !noTelepon || !selectedPaket) {
         alert('Ada field yang wajib diisi!');
-        return;
+        return;  
       }
+
+    // Periksa status produk yang dipilih
+    const selectedProduct = paketData.find(product => product.id === selectedPaket);
+    if (selectedProduct && selectedProduct.status !== 'OPEN') {
+        Alert.alert('Maaf', 'Produk belum tersedia.');
+        return;
+    }
+
       tambahJamaah();
       setNama('');
       setNik('');
       setNoTelepon('');
       setSelectedPaket('');
       setSelectedMitra('');
+
     };
 
     return (

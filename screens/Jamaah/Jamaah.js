@@ -19,6 +19,8 @@ import {
 import SelectDropdown from "react-native-select-dropdown";
 import { getStoreData } from "../../util/util.js";
 import { instance as axios } from "../../util/api.js";
+import ListHeader from "../../components/Jamaah/ListHeader.js";
+import JamaahTable from "../../components/Jamaah/JamaahTable.js";
 
 
 export default function Jamaah({ navigation }) {
@@ -59,11 +61,6 @@ export default function Jamaah({ navigation }) {
   const gotoAddJamaah = () => {
     navigation.navigate("Tambah Jamaah");
   };
-  const gotoEditJamaah = () => {
-    navigation.navigate("Edit Jamaah");
-  };
-
-
   // Fungsi untuk mengambil data dengan token dari AsyncStorage
   const fetchData = async () => {
     try {
@@ -84,11 +81,9 @@ export default function Jamaah({ navigation }) {
       console.error('Error fetching data:', error);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, []);
-
 
 
   return (
@@ -142,71 +137,9 @@ export default function Jamaah({ navigation }) {
             <FlatList
               data={pageData}
               keyExtractor={(item) => item.id.toString()}
-              ListHeaderComponent={() => (
-                <View style={styles.Hrow}>
-                  <Text style={[styles.Hcell, styles.header, { width: 50 }]}>
-                    NO
-                  </Text>
-                  <Text style={[styles.Hcell, styles.header]}>
-                    NAMA LENGKAP
-                  </Text>
-                  <Text style={[styles.Hcell, styles.header]}>
-                    JENIS KELAMIN
-                  </Text>
-                  <Text style={[styles.Hcell, styles.header]}>NAMA PAKET</Text>
-                  <Text style={[styles.Hcell, styles.header]}>NO TELP/HP</Text>
-                  <Text style={[styles.Hcell, styles.header]}>MITRA</Text>
-                  <Text style={[styles.Hcell, styles.header]}>CABANG</Text>
-                  <Text style={[styles.Hcell, styles.header]}>
-                    VOUCHER CODE
-                  </Text>
-                  <Text style={[styles.Hcell, styles.header]}>STATUS</Text>
-                  <Text style={[styles.Hcell, styles.header]}>ACTION</Text>
-                </View>
-              )}
+              ListHeaderComponent={() => (<ListHeader/>)}
               renderItem={({ item, index }) => (
-                <View style={styles.row}>
-                  <Text style={[styles.cell, { width: 35, textAlign: "left" }]}>
-                  {index + 1}
-                  </Text>
-                  <Text style={[styles.cell, { width: 95, fontWeight: "bold"}]}>{item.fullName}</Text>
-                  <Text style={styles.cell}>
-                  {item.gender ? "Perempuan" : "Laki-laki"}
-                  </Text>
-                  <Text style={styles.cell}>{item.productName}</Text>
-                  <Text style={[styles.cell, { width: 95 }]}>{item.mobileNo}</Text>
-                  <Text style={styles.cell}>{item.partnerName}</Text>
-                  <Text style={styles.cell}>{item.branchName}</Text>
-                  <Text style={[styles.cell, { width: 95 }]}>
-                    {item.voucherCode}
-                  </Text>
-                  <Text style={[styles.cell, { width: 88 }]}>
-                    {item.customerStatus}
-                  </Text>
-                  <Text style={styles.cell}>
-                    <View style={styles.iconContainer}>
-                      <TouchableOpacity onPress={gotoEditJamaah}>
-                        <FontAwesome5
-                          name="pencil-alt"
-                          size={15}
-                          color="#870144"
-                          style={{ marginRight: 5 }}
-                        />
-                      </TouchableOpacity>
-                      <Feather
-                        name="printer"
-                        size={15}
-                        color="#870144"
-                        style={{ marginRight: 5 }}
-                      />
-                      <MaterialCommunityIcons
-                        name="credit-card-check-outline"
-                        size={15}
-                        color="#870144"
-                      />
-                    </View>
-                  </Text>
-                </View>
+               <JamaahTable item={item} index={index} setCustomerData={setCustomerData} navigation={navigation} />
               )}
             />
           </View>

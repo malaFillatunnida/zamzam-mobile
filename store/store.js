@@ -1,12 +1,14 @@
-// store.js
+// // store.js
+// import { configureStore } from '@reduxjs/toolkit';
+// import jamaahReducer from './reducers/jamaahReducer'; 
+// import { TambahJamaah } from './actions/jamaahActions'; // Sesuaikan dengan path aksi Anda
 
-import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './authSlice';
+// const store = configureStore({
+//   reducer: {
+//     jamaah: jamaahReducer, // Sesuaikan dengan nama slice Anda
+//   },
+// });
 
-const store = configureStore({
-  reducer: {
-    auth: authReducer
-  },
-});
+// export default store;
 
-export default store;
+// export { TambahJamaah }; // Ekspor aksi Redux untuk digunakan dalam komponen

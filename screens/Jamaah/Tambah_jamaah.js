@@ -112,7 +112,7 @@ const handleSubmit = () => {
     // Periksa status produk yang dipilih
     const selectedProduct = paketData.find(product => product.id === selectedPaket);
     if (selectedProduct && selectedProduct.status !== 'OPEN') {
-        Alert.alert('Maaf', 'Produk belum tersedia.');
+        Alert.alert('Maaf', `Produk ${selectedProduct.productName} belum tersedia.`);
         return;
     }
 

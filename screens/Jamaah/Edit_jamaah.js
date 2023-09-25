@@ -20,15 +20,15 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 export default function Edit_jamaah({ navigation, route }) {
   const [jamaah, setJamaah] = useState([]);
   const { voucherCode } = route.params;
-
+  // state input
   const [fullName, setNama] = useState("");
   const [icNo, setNik] = useState("");
   const [mobileNo, setNoTelepon] = useState("");
   const [productId, setProductId] = useState("");
   const [selectedMitra, setSelectedMitra] = useState("");
+  const [visaProvider, setVisa] = useState("");
+  const [insurance, setInsurance] = useState("");
   const [fatherName, setFatherName] = useState("");
-  const [gender, setGender] = useState(true);
-  const [wni, setWni] = useState(true);
   const [maritalStatus, setMaritalStatus] = useState("");
   const [infantName, setInfantName] = useState("");
   const [infantNik, setInfantNik] = useState("");
@@ -69,10 +69,8 @@ export default function Edit_jamaah({ navigation, route }) {
   const [visaNo, setVisaNo] = useState("");
   const [visaName, setVisaName] = useState("");
   const [visaIssuedOn, setVisaIssuedOn] = useState(null);
-  const [visaIssuedAt, setVisaIssuedAt] = useState("");
   const [visaExpiredAt, setVisaExpiredAt] = useState(null);
-  const [visaProvider, setVisaProvider] = useState("");
-  const [insurance, setInsurance] = useState("");
+  const [visaIssuedAt, setVisaIssuedAt] = useState("");
   const [insuranceCustomerName, setInsuranceCustomerName] = useState("");
   const [insurancePolicyNo, setInsurancePolicyNo] = useState("");
   const [policyEntryDate, setPolicyEntryDate] = useState(null);
@@ -97,18 +95,30 @@ export default function Edit_jamaah({ navigation, route }) {
   const [journeyCompleted, setJourneyCompleted] = useState(true); //completed
   const [isChecked, setIsChecked] = useState(false);
 
-  const [switchOnGender, setSwitchOnGender] = useState(false);
-  const [switchOnWarga, setSwitchOnWarga] = useState(false);
-  const genderText = switchOnGender ? "Perempuan" : "Laki-laki";
-  const warga = switchOnWarga ? "WNI" : "WNA";
+  const [gender, setGender] = useState(true);
+  const [wni, setWni] = useState(true);
+  
+  // Define gender and warga based on the switch state
+  const gndr = gender ? "Perempuan" : "Laki-laki";
+  const warga = wni ? "WNI" : "WNA";
+  
+  // Define text color based on the switch state
+  // const genderTextColor = gender ? "#870144" : "#ffffff"; // Change to your desired color
+  const genderTextColor = gender ? "#870144" : "#000000";
+  const wargaTextColor = wni ? "#870144" : "#000000"; 
+
   const [postImage, setPostImage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  //fetch data
   const [partnerData, setPartnerData] = useState([]);
   const [paketData, setPaketData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [visaData, setVisaData] = useState([]);
+  const [insuranceData, setInsuranceData] = useState([]);
 
+  //  date picker
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
-  const [isInputEditable, setIsInputEditable] = useState(true); // State untuk mengontrol ke-editabilitasan TextInput
+  const [activeInput, setActiveInput] = useState(true); // State untuk mengontrol ke-editabilitasan TextInput
 
   const updateJamaah = async () => {
     try {
@@ -124,7 +134,7 @@ export default function Edit_jamaah({ navigation, route }) {
         maritalStatus: maritalStatus,
         infantName: infantName,
         infantNik: infantNik,
-        infantDob: infantDob,
+        infantDob: infantDob || null,
         infantChargedAmount: infantChargedAmount,
         upgradedHotelName: upgradedHotelName,
         upgradedHotelStar: upgradedHotelStar,
@@ -138,7 +148,7 @@ export default function Edit_jamaah({ navigation, route }) {
         specialPriceDescription: specialPriceDescription,
         email: email,
         placeOfBirth: placeOfBirth,
-        dateOfBirth: dateOfBirth,
+        dateOfBirth: dateOfBirth || null,
         occupation: occupation,
         mahram: mahram,
         mahramRelationship: mahramRelationship,
@@ -155,21 +165,21 @@ export default function Edit_jamaah({ navigation, route }) {
         nameOnPassport: nameOnPassport,
         passportName: passportName,
         passportFile: passportFile,
-        passportIssuedOn: passportIssuedOn,
+        passportIssuedOn: passportIssuedOn || null,
         passportIssuedAt: passportIssuedAt,
-        passportExpiredOn: passportExpiredOn,
+        passportExpiredOn: passportExpiredOn || null,
         visaNo: visaNo,
         visaName: visaName,
-        visaIssuedOn: visaIssuedOn,
+        visaIssuedOn: visaIssuedOn || null,
+        visaExpiredAt: visaExpiredAt || null,
         visaIssuedAt: visaIssuedAt,
-        visaExpiredAt: visaExpiredAt,
         visaProvider: visaProvider,
         insurance: insurance,
         insuranceCustomerName: insuranceCustomerName,
         insurancePolicyNo: insurancePolicyNo,
-        policyEntryDate: policyEntryDate,
-        policyStartingDate: policyStartingDate,
-        policyEndingDate: policyEndingDate,
+        policyEntryDate: policyEntryDate || null,
+        policyStartingDate: policyStartingDate || null,
+        policyEndingDate: policyEndingDate || null,
         healthCondition: healthCondition,
         education1: education1,
         education2: education2,
@@ -188,7 +198,7 @@ export default function Edit_jamaah({ navigation, route }) {
         journeyCompleted: journeyCompleted,
         arrivalBoardingPassFile: arrivalBoardingPassFile,
       };
-
+      
       console.log("ini form data", formData);
 
       await axios.put(`/customers/${voucherCode}`, formData, {
@@ -222,7 +232,7 @@ export default function Edit_jamaah({ navigation, route }) {
       setMaritalStatus(response.data.data.maritalStatus);
       setInfantName(response.data.data.infantName);
       setInfantNik(response.data.data.infantNik);
-      setInfantDob(response.data.data.infantDob);
+      setInfantDob(formatDateArray(response.data.data.infantDob));
       setInfantChargedAmount(response.data.data.infantChargedAmount);
       setUpgradedHotelName(response.data.data.upgradedHotelName);
       setUpgradedHotelStar(response.data.data.upgradedHotelStar);
@@ -236,7 +246,7 @@ export default function Edit_jamaah({ navigation, route }) {
       setSpecialPriceDescription(response.data.data.specialPriceDescription);
       setEmail(response.data.data.email);
       setPlaceOfBirth(response.data.data.placeOfBirth);
-      setDateOfBirth(response.data.data.dateOfBirth);
+      setDateOfBirth(formatDateArray(response.data.data.dateOfBirth));
       setOccupation(response.data.data.occupation);
       setMahram(response.data.data.mahram);
       setMahramRelationship(response.data.data.mahramRelationship);
@@ -253,22 +263,22 @@ export default function Edit_jamaah({ navigation, route }) {
       setPassportNo(response.data.data.passportNo);
       setPassportName(response.data.data.passportName);
       setPassportFile(response.data.data.passportFile);
-      setPassportIssuedOn(response.data.data.passportIssuedOn);
+      setPassportIssuedOn(formatDateArray(response.data.data.passportIssuedOn));
       setPassportIssuedAt(response.data.data.passportIssuedAt);
-      setPassportExpiredOn(response.data.data.passportExpiredOn);
+      setPassportExpiredOn(formatDateArray(response.data.data.passportExpiredOn));
       setVisaNo(response.data.data.visaNo);
       setVisaName(response.data.data.visaName);
-      setVisaIssuedOn(response.data.data.visaIssuedOn);
+      setVisaIssuedOn(formatDateArray(response.data.data.visaIssuedOn));
       setVisaIssuedAt(response.data.data.visaIssuedAt);
-      setVisaExpiredAt(response.data.data.visaExpiredAt);
-      setVisaProvider(response.data.data.visaProvider);
+      setVisaExpiredAt(formatDateArray(response.data.data.visaExpiredAt));
+      setVisa(response.data.data.visaProvider);
       setInsurance(response.data.data.insurance);
       setInsuranceCustomerName(response.data.data.insuranceCustomerName);
       setInsurancePolicyNo(response.data.data.insurancePolicyNo);
       setPassportIssuedAt(response.data.data.passportIssuedAt);
-      setPolicyEntryDate(response.data.data.policyEntryDate);
-      setPolicyStartingDate(response.data.data.policyStartingDate);
-      setPolicyEndingDate(response.data.data.policyEndingDate);
+      setPolicyEntryDate(formatDateArray(response.data.data.policyEntryDate));
+      setPolicyStartingDate(formatDateArray(response.data.data.policyStartingDate));
+      setPolicyEndingDate(formatDateArray(response.data.data.policyEndingDate));
       setHealthCondition(response.data.data.healthCondition);
       setEducation1(response.data.data.education1);
       setVaccineCertFile(response.data.data.vaccineCertFile);
@@ -288,31 +298,43 @@ export default function Edit_jamaah({ navigation, route }) {
     }
   };
 
-  // Fungsi untuk mengonversi format tanggal ke "dd/MM/yyyy"
-  const formatDate = (date) => {
+   // Fungsi untuk mengonversi format tanggal ke "dd/MM/yyyy"
+   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  };
-
+  };  
+   
   const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
     setShow(false);
-    setDate(currentDate);
-    setDateOfBirth(formatDate(currentDate));
-    setPassportIssuedOn(formatDate(currentDate));
-    setPassportExpiredOn(formatDate(currentDate));
-    setVisaIssuedOn(formatDate(currentDate));
-    setVisaIssuedAt(formatDate(currentDate));
-    setPolicyEntryDate(formatDate(currentDate));
-    setPolicyStartingDate(formatDate(currentDate));
-    setPolicyEndingDate(formatDate(currentDate));
-    setIsInputEditable(true); // Mengembalikan ke-editabilitasan TextInput setelah DateTimePicker ditutup
+    if (selectedDate) {
+      setDate(selectedDate);
+      const formattedDate = formatDate(selectedDate);
+      if (activeInput === 'dateOfBirth') {
+        setDateOfBirth(formattedDate);
+      } else if (activeInput === 'passportIssuedOn') {
+        setPassportIssuedOn(formattedDate);
+      } else if (activeInput === 'passportExpiredOn') {
+        setPassportExpiredOn(formattedDate);
+      } else if (activeInput === 'visaIssuedOn') {
+        setVisaIssuedOn(formattedDate);
+      } else if (activeInput === 'visaExpiredAt') {
+        setVisaExpiredAt(formattedDate);
+      } else if (activeInput === 'policyEntryDate') {
+        setPolicyEntryDate(formattedDate);
+      } else if (activeInput === 'policyStartingDate') {
+        setPolicyStartingDate(formattedDate);
+      } else if (activeInput === 'policyEndingDate') {
+        setPolicyEndingDate(formattedDate);
+      } else if (activeInput === 'infantDob') {
+        setInfantDob(formattedDate);
+      }
+    }
   };
 
-  const showDatePicker = () => {
-    setIsInputEditable(false); // Menonaktifkan ke-editabilitasan TextInput saat DateTimePicker ditampilkan
+  const showDatePickerHandler = (inputType) => {
+    setActiveInput(inputType);// Menonaktifkan ke-editabilitasan TextInput saat DateTimePicker ditampilkan
     setShow(true);
   };
 
@@ -388,20 +410,61 @@ export default function Edit_jamaah({ navigation, route }) {
       console.error("Error fetching data:", error);
     }
   };
+  // fetch Insurance
+  const fetchDataInsurance = async () => {
+    try {
+      // Mengirim permintaan GET dengan Axios
+      const response = await axios.get("/insurances", {
+        headers: {
+          Authorization: `Bearer ${await getStoreData("access_token")}`,
+        },
+      });
+
+      // Menggunakan data dari response
+      setInsuranceData(response.data);
+      // console.log(response.data);
+      setLoading(false);
+    } catch (error) {
+      // Handle error dengan benar
+      console.error("Error fetching data:", error);
+    }
+  };
+  // fetch Visa
+  const fetchDataVisa = async () => {
+    try {
+      // Mengirim permintaan GET dengan Axios
+      const response = await axios.get("/visa_providers", {
+        headers: {
+          Authorization: `Bearer ${await getStoreData("access_token")}`,
+        },
+      });
+
+      // Menggunakan data dari response
+      setVisaData(response.data);
+      // console.log(response.data);
+      setLoading(false);
+    } catch (error) {
+      // Handle error dengan benar
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
     fetchPartners();
     fetchDataPaket();
+    fetchDataInsurance();
+    fetchDataVisa();
   }, []);
 
   function formatDateArray(dateArray) {
     if (Array.isArray(dateArray) && dateArray.length === 3) {
       const [year, month, day] = dateArray;
-      const formattedDate = `${day}-${month}-${year}`;
+      const formattedMonth = month.toString().padStart(2, '0'); // Tambahkan nol jika bulan kurang dari 10
+      const formattedDate = `${day}/${formattedMonth}/${year}`;
       return formattedDate;
     }
     return ""; // Default jika data tidak valid
-  }
+  } 
 
   function formatMultipleDates(jamaah) {
     const formattedData = {};
@@ -423,7 +486,7 @@ export default function Edit_jamaah({ navigation, route }) {
 
   const formattedData = formatMultipleDates(jamaah);
   //   console.log(formattedData);
-
+ 
   useEffect(() => {
     // Ambil nilai dari database atau sumber data lainnya
     // Di sini, saya akan menggunakan objek sumber data sebagai contoh
@@ -456,19 +519,18 @@ export default function Edit_jamaah({ navigation, route }) {
   }, []);
 
   const handleSubmit = () => {
-    if (!fullName || !icNo || !mobileNo || !productId) {
-      alert("Ada field yang wajib diisi!");
-      return;
+    if (!fullName || !icNo || !mobileNo || !productId || !fatherName) {
+      alert('Ada field yang wajib diisi!');
+      return;  
     }
 
-    // Periksa status produk yang dipilih
-    const selectedProduct = paketData.find(
-      (product) => product.id === productId
-    );
-    if (selectedProduct && selectedProduct.status !== "OPEN") {
-      Alert.alert("Maaf", "Produk belum tersedia.");
+  // Periksa status produk yang dipilih
+  const selectedProduct = paketData.find(product => product.id === productId);
+  if (selectedProduct && selectedProduct.status !== 'OPEN') {
+      Alert.alert('Maaf', `Produk ${selectedProduct.productName} belum tersedia.`);
       return;
-    }
+  }
+
     updateJamaah();
   };
 
@@ -478,6 +540,7 @@ export default function Edit_jamaah({ navigation, route }) {
       <ScrollView>
         <ScrollView horizontal={true} style={styles.checklist}>
           <View style={styles.checkboxContainer}>
+            {/* registrasi */}
             <TouchableOpacity onPress={handleToggle}>
               <View style={styles.checkboxAndText}>
                 <View
@@ -493,6 +556,7 @@ export default function Edit_jamaah({ navigation, route }) {
               </View>
             </TouchableOpacity>
             <View style={styles.horizontalLine} />
+            {/* pelunasan */}
             <TouchableOpacity onPress={handleToggle}>
               <View style={styles.checkboxAndText}>
                 <View
@@ -527,7 +591,7 @@ export default function Edit_jamaah({ navigation, route }) {
                   )}
                 </View>
               </View>
-              <Text style={styles.checkboxLabel}>Take Off</Text>
+              <Text style={styles.checkboxLabel}>Manasik</Text>
             </TouchableOpacity>
             <View style={styles.horizontalLine} />
 
@@ -549,7 +613,7 @@ export default function Edit_jamaah({ navigation, route }) {
                   )}
                 </View>
               </View>
-              <Text style={styles.checkboxLabel}>Take Off</Text>
+              <Text style={styles.checkboxLabel}>Siskopatuh</Text>
             </TouchableOpacity>
             <View style={styles.horizontalLine} />
 
@@ -571,7 +635,7 @@ export default function Edit_jamaah({ navigation, route }) {
                   )}
                 </View>
               </View>
-              <Text style={styles.checkboxLabel}>Take Off</Text>
+              <Text style={styles.checkboxLabel}>Perlengkapan</Text>
             </TouchableOpacity>
             <View style={styles.horizontalLine} />
 
@@ -613,12 +677,6 @@ export default function Edit_jamaah({ navigation, route }) {
               </View>
               <Text style={styles.checkboxLabel}>Completed</Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity onPress={() => handleToggle(setJourneyCompleted)}>
-                            <View style={journeyCompleted ? styles.checkboxChecked : styles.checkboxUnchecked}>
-                                {journeyCompleted && <Text style={styles.checkIcon}>&#10003;</Text>}
-                            </View>
-                            <Text style={styles.checkboxLabel}>Completed</Text>
-                            </TouchableOpacity> */}
           </View>
         </ScrollView>
 
@@ -652,65 +710,57 @@ export default function Edit_jamaah({ navigation, route }) {
             value={mobileNo}
           />
           <View>
-            {show && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={date}
-                mode="date"
-                is24Hour={true}
-                display="spinner"
-                onChange={onChange}
-              />
-            )}
+             {show && (
+        <DateTimePicker
+          testID="dateTimePicker"
+          value={date}
+          mode="date"
+          is24Hour={true}
+          display="spinner"
+          onChange={onChange}
+        />
+      )}
           </View>
           <Text>Tanggal Lahir</Text>
           <TextInput
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('dateOfBirth')}
             value={dateOfBirth}
-            editable={isInputEditable}
+            editable={!show}
             onValueChange={setDateOfBirth}
-            defaultValue={formatDateArray(dateOfBirth)}
+            defaultValue={formatDateArray(dateOfBirth)} 
           />
-          {/* <TextInput
-                        style={styles.input}
-                        // keyboardType="numeric"
-                        format="DD-MM-YYYY"
-                        placeholder="DD-MM-YYYY"
-                        selectionColor="#870144"
-                    /> */}
           <Text style={{ marginTop: 5 }}>Jenis Kelamin</Text>
-          <View style={styles.toggle}>
-            <Switch
-              selectedValue={gender}
-              value={switchOnGender}
-              onValueChange={() => {
-                setSwitchOnGender(!switchOnGender);
-              }}
-              thumbColor={switchOnGender ? "#870144" : "#fff"}
-              trackColor={{ false: "#ddd", true: "#ddd" }}
-            />
-            <Text style={styles.genderText}>{genderText}</Text>
-          </View>
-          <Text style={{ marginTop: 10 }}>Kewarganegaraan</Text>
-          <View style={styles.toggle}>
-            <Switch
-              selectedValue={wni}
-              value={switchOnWarga}
-              onValueChange={() => {
-                setSwitchOnWarga(!switchOnWarga);
-              }}
-              thumbColor={switchOnWarga ? "#870144" : "#fff"}
-              trackColor={{ false: "#ddd", true: "#ddd" }}
-            />
-            <Text style={styles.genderText}>{warga}</Text>
-          </View>
+    <View style={styles.toggle}>
+      <Switch
+        value={gender}
+        onValueChange={() => {
+          setGender(!gender);
+        }}
+        thumbColor={gender ? "#870144" : "#fff"}
+        trackColor={{ false: "#ddd", true: "#ddd" }}
+      />
+      <Text style={{ ...styles.genderText, color: genderTextColor }}>{gndr}</Text>
+    </View>
+    <Text style={{ marginTop: 10 }}>Kewarganegaraan</Text>
+    <View style={styles.toggle}>
+      <Switch
+        value={wni}
+        onValueChange={() => {
+          setWni(!wni);
+        }}
+        thumbColor={wni ? "#870144" : "#fff"}
+        trackColor={{ false: "#ddd", true: "#ddd" }}
+      />
+      <Text style={{ ...styles.genderText, color: wargaTextColor }}>{warga}</Text>
+    </View>
+        
           <Text>Tempat Lahir</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setPlaceOfBirth}
+            onChangeText={setPlaceOfBirth}
             placeholder="Tempat Lahir"
             selectionColor="#870144"
             value={placeOfBirth}
@@ -937,8 +987,8 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama Mahram</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setMahram}
-            placeholder="Nama Ayah"
+            onChangeText={setMahram}
+            placeholder="Nama Mahram"
             selectionColor="#870144"
             value={mahram}
           />
@@ -982,7 +1032,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Kota</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setCity}
+            onChangeText={setCity}
             placeholder="Kota"
             selectionColor="#870144"
             value={city}
@@ -990,7 +1040,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Propinsi</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setProvince}
+            onChangeText={setProvince}
             placeholder="Propinsi"
             selectionColor="#870144"
             value={province}
@@ -998,7 +1048,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Kode Pos</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setPostalCode}
+            onChangeText={setPostalCode}
             keyboardType="numeric"
             placeholder="Kode Pos"
             selectionColor="#870144"
@@ -1010,7 +1060,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>No Passport</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setPassportNo}
+            onChangeText={setPassportNo}
             keyboardType="numeric"
             placeholder="No Passport"
             selectionColor="#870144"
@@ -1019,7 +1069,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama Passport</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setPassportName}
+            onChangeText={setPassportName}
             placeholder="Nama Passport"
             selectionColor="#870144"
             value={passportName}
@@ -1027,7 +1077,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Kota Passport</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setPassportIssuedAt}
+            onChangeText={setPassportIssuedAt}
             placeholder="Kota Passport"
             selectionColor="#870144"
             value={passportIssuedAt}
@@ -1037,10 +1087,10 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('passportIssuedOn')}
             value={passportIssuedOn}
-            editable={isInputEditable}
-            onValueChange={setPassportIssuedOn}
+            editable={!show}
+            onChangeText={setPassportIssuedOn}
             defaultValue={formatDateArray(passportIssuedOn)}
           />
           <Text>Tanggal Habis Berlaku</Text>
@@ -1048,50 +1098,43 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('passportExpiredOn')}
             value={passportExpiredOn}
-            editable={isInputEditable}
-            onValueChange={setPassportExpiredOn}
+            editable={!show}
+             Text={setPassportExpiredOn}
             defaultValue={formatDateArray(passportExpiredOn)}
           />
 
           {/* Data Visa */}
           <Text style={styles.title}>Data Visa</Text>
-          <Text>Visa Provider</Text>
+        
+          <Text>Visa Provider </Text>
           <View style={styles.inputOption}>
             <Picker
-              selectedvalue={visaProvider}
-              onValueChange={(itemValue, itemIndex) =>
-                setVisaProvider(itemValue)
-              }
+              selectedValue={visaProvider}
+              onValueChange={(itemValue, itemIndex) => setVisa(itemValue)}
               style={styles.pickerItemStyle}
+              value={visaProvider}
             >
               <Picker.Item
                 style={styles.pickerItemPilih}
-                label="Pilih Visa Provider"
+                label="Pilih Visa Provider "
                 value=""
               />
-              <Picker.Item
-                style={styles.pickerItemStyle}
-                label="Visa Provider A"
-                value="Visa Provider A"
-              />
-              <Picker.Item
-                style={styles.pickerItemStyle}
-                label="Visa Provider B"
-                value="Visa Provider B"
-              />
-              <Picker.Item
-                style={styles.pickerItemStyle}
-                label="Visa Provider C"
-                value="Visa Provider C"
-              />
+              {visaData.map((provider) => (
+                <Picker.Item
+                  key={provider.id}
+                  style={styles.pickerItemStyle}
+                  label={provider.providerName}
+                  value={provider.id}
+                />
+              ))}
             </Picker>
           </View>
           <Text>No Visa</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setVisaNo}
+            onChangeText={setVisaNo}
             placeholder="No Visa"
             selectionColor="#870144"
             value={visaNo}
@@ -1099,7 +1142,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama Visa</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setVisaName}
+            onChangeText={setVisaName}
             placeholder="Nama Visa"
             selectionColor="#870144"
             value={visaName}
@@ -1109,10 +1152,10 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('visaIssuedOn')}
             value={visaIssuedOn}
-            editable={isInputEditable}
-            onValueChange={setVisaIssuedOn}
+            editable={!show}
+            onChangeText={setVisaIssuedOn}
             defaultValue={formatDateArray(visaIssuedOn)}
           />
           <Text>Tanggal Akhir</Text>
@@ -1120,48 +1163,41 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('visaExpiredAt')}
             value={visaExpiredAt}
-            editable={isInputEditable}
-            onValueChange={setVisaExpiredAt}
+            editable={!show}
+            onChangeText={setVisaExpiredAt}
             defaultValue={formatDateArray(visaExpiredAt)}
           />
-
           {/* Data Asuransi */}
           <Text style={styles.title}>Data Asuransi</Text>
           <Text>Data Asuransi</Text>
           <View style={styles.inputOption}>
             <Picker
-              selectedvalue={insurance}
+              selectedValue={insurance}
               onValueChange={(itemValue, itemIndex) => setInsurance(itemValue)}
               style={styles.pickerItemStyle}
+              value={insurance}
             >
               <Picker.Item
                 style={styles.pickerItemPilih}
-                label="Pilih Data Asuransi"
+                label="Pilih Insurance "
                 value=""
               />
-              <Picker.Item
-                style={styles.pickerItemStyle}
-                label="Data Asuransi A"
-                value="Data Asuransi A"
-              />
-              <Picker.Item
-                style={styles.pickerItemStyle}
-                label="Data Asuransi B"
-                value="Data Asuransi B"
-              />
-              <Picker.Item
-                style={styles.pickerItemStyle}
-                label="Data Asuransi C"
-                value="Data Asuransi C"
-              />
+              {insuranceData.map((insurance) => (
+                <Picker.Item
+                  key={insurance.id}
+                  style={styles.pickerItemStyle}
+                  label={insurance.providerName}
+                  value={insurance.id}
+                />
+              ))}
             </Picker>
           </View>
           <Text>No Polis</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setInsurancePolicyNo}
+            onChangeText={setInsurancePolicyNo}
             placeholder="No Polis"
             selectionColor="#870144"
             value={insurancePolicyNo}
@@ -1169,7 +1205,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama Polis</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setInsuranceCustomerName}
+            onChangeText={setInsuranceCustomerName}
             placeholder="Nama Polis"
             selectionColor="#870144"
             value={insuranceCustomerName}
@@ -1179,10 +1215,10 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('policyEntryDate')}
             value={policyEntryDate}
-            editable={isInputEditable}
-            onValueChange={setPolicyEntryDate}
+            editable={!show}
+            onChangeText={setPolicyEntryDate}
             defaultValue={formatDateArray(policyEntryDate)}
           />
           <Text>Tanggal Berlaku</Text>
@@ -1190,10 +1226,10 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('policyStartingDate')}
             value={policyStartingDate}
-            editable={isInputEditable}
-            onValueChange={setPolicyStartingDate}
+            editable={!show}
+            onChangeText={setPolicyStartingDate}
             defaultValue={formatDateArray(policyStartingDate)}
           />
           <Text>Tanggal Akhir</Text>
@@ -1201,10 +1237,10 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('policyEndingDate')}
             value={policyEndingDate}
-            editable={isInputEditable}
-            onValueChange={setPolicyEndingDate}
+            editable={!show}
+            onChangeText={setPolicyEndingDate}
             defaultValue={formatDateArray(policyEndingDate)}
           />
 
@@ -1266,7 +1302,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Kondisi Kesehatan</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setHealthCondition}
+            onChangeText={setHealthCondition}
             multiline={true}
             numberOfLines={4}
             placeholder="Kondisi Kesehatan"
@@ -1495,7 +1531,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama sesuai NIK</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setInfantName}
+            onChangeText={setInfantName}
             placeholder="Nama sesuai NIK"
             selectionColor="#870144"
             value={infantName}
@@ -1503,7 +1539,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>NIK Infant</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setInfantNik}
+            onChangeText={setInfantNik}
             keyboardType="numeric"
             placeholder="NIK"
             selectionColor="#870144"
@@ -1514,19 +1550,20 @@ export default function Edit_jamaah({ navigation, route }) {
             style={styles.input}
             selectionColor="#870144"
             placeholder="dd/MM/yyyy"
-            onFocus={showDatePicker}
+            onFocus={() => showDatePickerHandler('infantDob')}
             value={infantDob}
-            editable={isInputEditable}
-            onValueChange={setInfantDob}
+            editable={!show}
+            onChangeText={setInfantDob}
             defaultValue={formatDateArray(infantDob)}
           />
           <Text>Biaya tambahan untuk Infant</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setInfantChargedAmount}
+            onTextChange={setInfantChargedAmount}
+            keyboardType="numeric"
             placeholder="Biaya tambahan untuk Infant"
             selectionColor="#870144"
-            value={infantChargedAmount}
+            value={infantChargedAmount.toString()}
           />
 
           {/* Tambah Infant */}
@@ -1534,7 +1571,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama Hotel</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setUpgradedHotelName}
+            onChangeText={setUpgradedHotelName}
             placeholder="Nama Hotel"
             selectionColor="#870144"
             value={upgradedHotelName}
@@ -1616,11 +1653,11 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Biaya Upgrade Hotel</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setUpgradedHotelPrice}
+            onChangeText={setUpgradedHotelPrice}
             keyboardType="numeric"
             placeholder="Biaya Upgrade Hotel"
             selectionColor="#870144"
-            value={upgradedHotelPrice}
+            value={upgradedHotelPrice.toString()}
           />
 
           {/* Upgrade Maskapai */}
@@ -1628,7 +1665,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Nama Maskapai</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setUpgradedAirlineName}
+            onChangeText={setUpgradedAirlineName}
             placeholder="Nama Maskapai"
             selectionColor="#870144"
             value={upgradedAirlineName}
@@ -1636,7 +1673,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Kode Maskapai</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setUpgradedAirlineCode}
+            onChangeText={setUpgradedAirlineCode}
             placeholder="Kode Maskapai"
             selectionColor="#870144"
             value={upgradedAirlineCode}
@@ -1653,7 +1690,7 @@ export default function Edit_jamaah({ navigation, route }) {
             >
               <Picker.Item
                 style={styles.pickerItemPilih}
-                label="Pilih Kelas"
+                label="Pilih Kelas"upgradedAirlinePrice
                 value=""
               />
               <Picker.Item
@@ -1671,11 +1708,11 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Biaya Upgrade Maskapai</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setUpgradedAirlinePrice}
+            onChangeText={setUpgradedAirlinePrice}
             keyboardType="numeric"
             placeholder="Biaya Upgrade Maskapai"
             selectionColor="#870144"
-            value={upgradedAirlinePrice}
+            value={upgradedAirlinePrice.toString()}
           />
 
           {/* Permintaan Khusus Lainnya */}
@@ -1683,7 +1720,7 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Permintaan khusus lainnya</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setSpecialPriceDescription}
+            onChangeText={setSpecialPriceDescription}
             placeholder="Permintaan khusus lainnya"
             selectionColor="#870144"
             value={specialPriceDescription}
@@ -1691,11 +1728,11 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Biaya Tambahan</Text>
           <TextInput
             style={styles.input}
-            onValueChange={setSpecialPrice}
+            onChangeText={setSpecialPrice}
             keyboardType="numeric"
             placeholder="Biaya tambahan"
             selectionColor="#870144"
-            value={specialPrice}
+            value={specialPrice.toString()}
           />
         </View>
       </ScrollView>

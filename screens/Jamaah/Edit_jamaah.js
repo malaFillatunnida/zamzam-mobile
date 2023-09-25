@@ -6,8 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  CheckBox,
-  Image,
   Alert,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -56,13 +54,13 @@ export default function Edit_jamaah({ navigation, route }) {
   const [district, setDistrict] = useState("");
   const [subDistrict, setSubDistrict] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [icFile, setIcFile] = useState("");
+  const [icFile, setIcFile] = useState(null);
   const [kkNo, setKkNo] = useState("");
-  const [kkFile, setKkFile] = useState("");
+  const [kkFile, setKkFile] = useState(null);
   const [passportNo, setPassportNo] = useState("");
   const [nameOnPassport, setNameOnPassport] = useState("");
   const [passportName, setPassportName] = useState("");
-  const [passportFile, setPassportFile] = useState("");
+  const [passportFile, setPassportFile] = useState(null);
   const [passportIssuedOn, setPassportIssuedOn] = useState("");
   const [passportIssuedAt, setPassportIssuedAt] = useState(null);
   const [passportExpiredOn, setPassportExpiredOn] = useState(null);
@@ -82,12 +80,12 @@ export default function Edit_jamaah({ navigation, route }) {
   const [education3, setEducation3] = useState("");
   const [education4, setEducation4] = useState("");
   const [education5, setEducation5] = useState("");
-  const [vaccineCertFile, setVaccineCertFile] = useState("");
-  const [vaccineCert2File, setVaccineCert2File] = useState("");
-  const [vaccineCert3File, setVaccineCert3File] = useState("");
-  const [yellowBookFile, setYellowBookFile] = useState("");
-  const [photoFile, setPhotoFile] = useState("");
-  const [arrivalBoardingPassFile, setArrivalBoardingPassFile] = useState("");
+  const [vaccineCertFile, setVaccineCertFile] = useState(null);
+  const [vaccineCert2File, setVaccineCert2File] = useState(null);
+  const [vaccineCert3File, setVaccineCert3File] = useState(null);
+  const [yellowBookFile, setYellowBookFile] = useState(null);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [arrivalBoardingPassFile, setArrivalBoardingPassFile] = useState(null);
   const [manasikCompleted, setManasikCompleted] = useState(true); // manasik
   const [siskopatuhCompleted, setSiskopatuhCompleted] = useState(false); //siskopatuh
   const [amenitiesCompleted, setAmenitiesCompleted] = useState(true); // perlengkapan
@@ -97,18 +95,18 @@ export default function Edit_jamaah({ navigation, route }) {
 
   const [gender, setGender] = useState(true);
   const [wni, setWni] = useState(true);
-  
+
   // Define gender and warga based on the switch state
   const gndr = gender ? "Perempuan" : "Laki-laki";
   const warga = wni ? "WNI" : "WNA";
-  
+
   // Define text color based on the switch state
   // const genderTextColor = gender ? "#870144" : "#ffffff"; // Change to your desired color
   const genderTextColor = gender ? "#870144" : "#000000";
-  const wargaTextColor = wni ? "#870144" : "#000000"; 
+  const wargaTextColor = wni ? "#870144" : "#000000";
 
-  const [postImage, setPostImage] = useState(null);
   const [loading, setLoading] = useState(true);
+
   //fetch data
   const [partnerData, setPartnerData] = useState([]);
   const [paketData, setPaketData] = useState([]);
@@ -198,7 +196,7 @@ export default function Edit_jamaah({ navigation, route }) {
         journeyCompleted: journeyCompleted,
         arrivalBoardingPassFile: arrivalBoardingPassFile,
       };
-      
+
       console.log("ini form data", formData);
 
       await axios.put(`/customers/${voucherCode}`, formData, {
@@ -256,13 +254,13 @@ export default function Edit_jamaah({ navigation, route }) {
       setDistrict(response.data.data.district);
       setSubDistrict(response.data.data.subDistrict);
       setPostalCode(response.data.data.postalCode);
-      setIcFile(response.data.data.icFile);
+      setIcFile(response.data.data.icFileName);
       setKkNo(response.data.data.kkNo);
-      setKkFile(response.data.data.kkFile);
+      setKkFile(response.data.data.kkFileName);
       setNameOnPassport(response.data.data.nameOnPassport);
       setPassportNo(response.data.data.passportNo);
       setPassportName(response.data.data.passportName);
-      setPassportFile(response.data.data.passportFile);
+      setPassportFile(response.data.data.passportFileName);
       setPassportIssuedOn(formatDateArray(response.data.data.passportIssuedOn));
       setPassportIssuedAt(response.data.data.passportIssuedAt);
       setPassportExpiredOn(formatDateArray(response.data.data.passportExpiredOn));
@@ -281,31 +279,31 @@ export default function Edit_jamaah({ navigation, route }) {
       setPolicyEndingDate(formatDateArray(response.data.data.policyEndingDate));
       setHealthCondition(response.data.data.healthCondition);
       setEducation1(response.data.data.education1);
-      setVaccineCertFile(response.data.data.vaccineCertFile);
-      setVaccineCert2File(response.data.data.vaccineCert2File);
-      setVaccineCert3File(response.data.data.vaccineCert3File);
-      setYellowBookFile(response.data.data.yellowBookFile);
-      setPhotoFile(response.data.data.photoFile);
+      setVaccineCertFile(response.data.data.vaccineCertFileName);
+      setVaccineCert2File(response.data.data.vaccineCert2FileName);
+      setVaccineCert3File(response.data.data.vaccineCert3FileName);
+      setYellowBookFile(response.data.data.yellowBookFileName);
+      setPhotoFile(response.data.data.photoFileName);
       setManasikCompleted(response.data.data.manasikCompleted);
       setSiskopatuhCompleted(response.data.data.siskopatuhCompleted);
       setAmenitiesCompleted(response.data.data.amenitiesCompleted);
       setTakeOff(response.data.data.takeOff);
       setJourneyCompleted(response.data.data.journeyCompleted);
-      setArrivalBoardingPassFile(response.data.data.arrivalBoardingPassFile);
+      setArrivalBoardingPassFile(response.data.data.arrivalBoardingPassFileName);
       setLoading(false);
     } catch (err) {
       console.log(err);
     }
   };
 
-   // Fungsi untuk mengonversi format tanggal ke "dd/MM/yyyy"
-   const formatDate = (date) => {
+  // Fungsi untuk mengonversi format tanggal ke "dd/MM/yyyy"
+  const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
-  };  
-   
+  };
+
   const onChange = (event, selectedDate) => {
     setShow(false);
     if (selectedDate) {
@@ -340,18 +338,18 @@ export default function Edit_jamaah({ navigation, route }) {
 
   useEffect(() => {
     async function requestMediaLibraryPermissions() {
-      if (Platform.OS !== "web") {
+      if (Platform.OS !== 'web') {
         const { status } =
           await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-          alert("Permintaan ditolak");
+        if (status !== 'granted') {
+          alert('Permintaan ditolak');
         }
       }
     }
     requestMediaLibraryPermissions();
   }, []);
 
-  const PickImage = async () => {
+  const PickImage = async (imageType) => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -359,17 +357,80 @@ export default function Edit_jamaah({ navigation, route }) {
       quality: 1,
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       const imageUri = result.assets[0].uri;
-      // console.log(imageUri);
-      setPostImage(imageUri);
+      if (imageType === 'ktp') {
+        setIcFile(imageUri);
+      } else if (imageType === 'kk') {
+        setKkFile(imageUri);
+      } else if (imageType === 'passport') {
+        setPassportFile(imageUri);
+      } else if (imageType === 'pasfoto') {
+        setPhotoFile(imageUri);
+      } else if (imageType === 'vaksin') {
+        setVaccineCertFile(imageUri);
+      } else if (imageType === 'bukukuning') {
+        setYellowBookFile(imageUri);
+      } else if (imageType === 'vaksindua') {
+        setVaccineCert2File(imageUri);
+      } else if (imageType === 'boarding') {
+        setArrivalBoardingPassFile(imageUri);
+      } else if (imageType === 'vaksintiga') {
+        setVaccineCert3File(imageUri);
+      }
     }
   };
 
-  const gotoUploadDetail = () => {
-    if (postImage) {
-      navigation.navigate("Upload Detail", { imageUri: postImage });
+  const gotoUploadDetail = (imageType) => {
+    let imageUri = null;
+
+    switch (imageType) {
+      case 'ktp':
+        imageUri = icFile;
+        break;
+      case 'kk':
+        imageUri = kkFile;
+        break;
+      case 'passport':
+        imageUri = passportFile;
+        break;
+      case 'pasfoto':
+        imageUri = photoFile;
+        break;
+      case 'vaksin':
+        imageUri = vaccineCertFile;
+        break;
+      case 'bukukuning':
+        imageUri = yellowBookFile;
+        break;
+      case 'vaksindua':
+        imageUri = vaccineCert2File;
+        break;
+      case 'boarding':
+        imageUri = arrivalBoardingPassFile;
+        break;
+      case 'vaksintiga':
+        imageUri = vaccineCert3File;
+        break;
+      default:
+        break;
     }
+
+    // Navigasi ke halaman Upload Detail dengan imageUri yang sesuai
+    if (imageUri) {
+      navigation.navigate('Upload Detail', { imageUri });
+    } else {
+      alert('Upload gambar terlebih dahulu.');
+    }
+  };
+
+  // Fungsi untuk mengambil nama file dari URI gambar
+  const getFileNameFromUrl = (url) => {
+    if (url) {
+      const parts = url.split('/');
+      return parts[parts.length - 1];
+    }
+    return null;
   };
 
   // fetch partners
@@ -403,7 +464,6 @@ export default function Edit_jamaah({ navigation, route }) {
 
       // Menggunakan data dari response
       setPaketData(response.data);
-      // console.log(response.data);
       setLoading(false);
     } catch (error) {
       // Handle error dengan benar
@@ -422,7 +482,6 @@ export default function Edit_jamaah({ navigation, route }) {
 
       // Menggunakan data dari response
       setInsuranceData(response.data);
-      // console.log(response.data);
       setLoading(false);
     } catch (error) {
       // Handle error dengan benar
@@ -441,7 +500,6 @@ export default function Edit_jamaah({ navigation, route }) {
 
       // Menggunakan data dari response
       setVisaData(response.data);
-      // console.log(response.data);
       setLoading(false);
     } catch (error) {
       // Handle error dengan benar
@@ -454,6 +512,7 @@ export default function Edit_jamaah({ navigation, route }) {
     fetchDataPaket();
     fetchDataInsurance();
     fetchDataVisa();
+    fetchCustomerId();
   }, []);
 
   function formatDateArray(dateArray) {
@@ -464,7 +523,7 @@ export default function Edit_jamaah({ navigation, route }) {
       return formattedDate;
     }
     return ""; // Default jika data tidak valid
-  } 
+  }
 
   function formatMultipleDates(jamaah) {
     const formattedData = {};
@@ -486,7 +545,7 @@ export default function Edit_jamaah({ navigation, route }) {
 
   const formattedData = formatMultipleDates(jamaah);
   //   console.log(formattedData);
- 
+
   useEffect(() => {
     // Ambil nilai dari database atau sumber data lainnya
     // Di sini, saya akan menggunakan objek sumber data sebagai contoh
@@ -511,25 +570,20 @@ export default function Edit_jamaah({ navigation, route }) {
     if (setter === false) {
       return;
     }
-
   };
-
-  useEffect(() => {
-    fetchCustomerId();
-  }, []);
 
   const handleSubmit = () => {
     if (!fullName || !icNo || !mobileNo || !productId || !fatherName) {
       alert('Ada field yang wajib diisi!');
-      return;  
+      return;
     }
 
-  // Periksa status produk yang dipilih
-  const selectedProduct = paketData.find(product => product.id === productId);
-  if (selectedProduct && selectedProduct.status !== 'OPEN') {
+    // Periksa status produk yang dipilih
+    const selectedProduct = paketData.find(product => product.id === productId);
+    if (selectedProduct && selectedProduct.status !== 'OPEN') {
       Alert.alert('Maaf', `Produk ${selectedProduct.productName} belum tersedia.`);
       return;
-  }
+    }
 
     updateJamaah();
   };
@@ -710,16 +764,16 @@ export default function Edit_jamaah({ navigation, route }) {
             value={mobileNo}
           />
           <View>
-             {show && (
-        <DateTimePicker
-          testID="dateTimePicker"
-          value={date}
-          mode="date"
-          is24Hour={true}
-          display="spinner"
-          onChange={onChange}
-        />
-      )}
+            {show && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={date}
+                mode="date"
+                is24Hour={true}
+                display="spinner"
+                onChange={onChange}
+              />
+            )}
           </View>
           <Text>Tanggal Lahir</Text>
           <TextInput
@@ -730,33 +784,33 @@ export default function Edit_jamaah({ navigation, route }) {
             value={dateOfBirth}
             editable={!show}
             onValueChange={setDateOfBirth}
-            defaultValue={formatDateArray(dateOfBirth)} 
+            defaultValue={formatDateArray(dateOfBirth)}
           />
           <Text style={{ marginTop: 5 }}>Jenis Kelamin</Text>
-    <View style={styles.toggle}>
-      <Switch
-        value={gender}
-        onValueChange={() => {
-          setGender(!gender);
-        }}
-        thumbColor={gender ? "#870144" : "#fff"}
-        trackColor={{ false: "#ddd", true: "#ddd" }}
-      />
-      <Text style={{ ...styles.genderText, color: genderTextColor }}>{gndr}</Text>
-    </View>
-    <Text style={{ marginTop: 10 }}>Kewarganegaraan</Text>
-    <View style={styles.toggle}>
-      <Switch
-        value={wni}
-        onValueChange={() => {
-          setWni(!wni);
-        }}
-        thumbColor={wni ? "#870144" : "#fff"}
-        trackColor={{ false: "#ddd", true: "#ddd" }}
-      />
-      <Text style={{ ...styles.genderText, color: wargaTextColor }}>{warga}</Text>
-    </View>
-        
+          <View style={styles.toggle}>
+            <Switch
+              value={gender}
+              onValueChange={() => {
+                setGender(!gender);
+              }}
+              thumbColor={gender ? "#870144" : "#fff"}
+              trackColor={{ false: "#ddd", true: "#ddd" }}
+            />
+            <Text style={{ ...styles.genderText, color: genderTextColor }}>{gndr}</Text>
+          </View>
+          <Text style={{ marginTop: 10 }}>Kewarganegaraan</Text>
+          <View style={styles.toggle}>
+            <Switch
+              value={wni}
+              onValueChange={() => {
+                setWni(!wni);
+              }}
+              thumbColor={wni ? "#870144" : "#fff"}
+              trackColor={{ false: "#ddd", true: "#ddd" }}
+            />
+            <Text style={{ ...styles.genderText, color: wargaTextColor }}>{warga}</Text>
+          </View>
+
           <Text>Tempat Lahir</Text>
           <TextInput
             style={styles.input}
@@ -1006,7 +1060,6 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Alamat</Text>
           <TextInput
             style={styles.input}
-            // onValueChange={setStreetAddress}
             onChangeText={setStreetAddress}
             placeholder="Alamat"
             selectionColor="#870144"
@@ -1015,7 +1068,6 @@ export default function Edit_jamaah({ navigation, route }) {
           <Text>Kelurahan</Text>
           <TextInput
             style={styles.input}
-            // onValueChange={setSubDistrict}
             onChangeText={setSubDistrict}
             placeholder="Kelurahan"
             selectionColor="#870144"
@@ -1101,13 +1153,13 @@ export default function Edit_jamaah({ navigation, route }) {
             onFocus={() => showDatePickerHandler('passportExpiredOn')}
             value={passportExpiredOn}
             editable={!show}
-             Text={setPassportExpiredOn}
+            Text={setPassportExpiredOn}
             defaultValue={formatDateArray(passportExpiredOn)}
           />
 
           {/* Data Visa */}
           <Text style={styles.title}>Data Visa</Text>
-        
+
           <Text>Visa Provider </Text>
           <View style={styles.inputOption}>
             <Picker
@@ -1320,24 +1372,14 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="KTP"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(icFile)}
+                  onChangeText={(text) => setIcFile(text)}
                 />
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={PickImage}
-                >
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity style={styles.uploadButton} onPress={() => PickImage('ktp')}>
+                  <Text style={styles.uploadText} onPress={PickImage}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.uploadButton}
-                  onPress={gotoUploadDetail}
-                >
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity style={styles.uploadButton} onPress={() => gotoUploadDetail('ktp')}>
+                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1348,18 +1390,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="KK"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(kkFile)}
+                  onChangeText={(text) => setKkFile(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('kk')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('kk')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1370,18 +1412,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Passport"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(passportFile)}
+                  onChangeText={(text) => setPassportFile(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('passport')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('passport')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1392,18 +1434,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Pas Foto"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(photoFile)}
+                  onChangeText={(text) => setPhotoFile(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('pasfoto')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('pasfoto')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1414,18 +1456,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Vaksin"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(vaccineCertFile)}
+                  onChangeText={(text) => setVaccineCertFile(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('vaksin')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('vaksin')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1436,18 +1478,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Buku Kuning"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(yellowBookFile)}
+                  onChangeText={(text) => setYellowBookFile(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('bukukuning')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('bukukuning')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1458,18 +1500,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Vaksin 2"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(vaccineCert2File)}
+                  onChangeText={(text) => setVaccineCert2File(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('vaksindua')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('vaksindua')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1480,18 +1522,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Boarding Pass"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(arrivalBoardingPassFile)}
+                  onChangeText={(text) => setArrivalBoardingPassFile(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('boarding')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('boarding')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1502,18 +1544,18 @@ export default function Edit_jamaah({ navigation, route }) {
                   style={styles.input}
                   placeholder="Vaksin 3"
                   selectionColor="#870144"
-                  value={postImage}
-                  onValueChange={(text) => setPostImage}
+                  value={getFileNameFromUrl(vaccineCert3File)}
+                  onChangeText={(text) => setVaccineCert3File(text)}
                 />
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={PickImage}>
-                    Upload
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => PickImage('vaksintiga')}>Upload</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.uploadButton}>
-                  <Text style={styles.uploadText} onPress={gotoUploadDetail}>
-                    View
-                  </Text>
+                <TouchableOpacity
+                  style={styles.uploadButton}
+                >
+                  <Text style={styles.uploadText} onPress={() => gotoUploadDetail('vaksintiga')}>View</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1690,7 +1732,7 @@ export default function Edit_jamaah({ navigation, route }) {
             >
               <Picker.Item
                 style={styles.pickerItemPilih}
-                label="Pilih Kelas"upgradedAirlinePrice
+                label="Pilih Kelas" upgradedAirlinePrice
                 value=""
               />
               <Picker.Item

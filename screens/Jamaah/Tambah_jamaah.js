@@ -3,10 +3,14 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert } from 'react
 import { Picker } from '@react-native-picker/picker';
 import { getStoreData } from '../../util/util';
 import { instance as axios } from '../../util/api';
+import { connect, useDispatch, useSelector } from 'react-redux'; // Import connect and useDispatch
+import { addJamaah, fetchDataPaket,  fetchPartners } from '../../store/actions/jamaahActions.js';
 
-export default function Tambah_jamaah({ navigation }) {
-    const [partnerData, setPartnerData] = useState([]);
-    const [paketData, setPaketData] = useState([]);
+function Tambah_jamaah({ navigation }) {
+    // const [partnerData, setPartnerData] = useState([]);
+    // const [paketData, setPaketData] = useState([]);
+    const partnerData = useSelector(state => state.jamaah.partnerData);
+    const paketData = useSelector(state => state.jamaah.paketData);
     const [loading, setLoading] = useState(true);
     
     const [nama, setNama] = useState('');
@@ -16,7 +20,7 @@ export default function Tambah_jamaah({ navigation }) {
     const [selectedMitra, setSelectedMitra] = useState('');
     const branch_id = partnerData.map((partner) => partner.branchId).toString();
     const [customerAdded, setCustomerAdded] = useState(false);
-
+    const dispatch = useDispatch();
 
     // add jamaah
     const tambahJamaah = async () => {
@@ -38,7 +42,9 @@ export default function Tambah_jamaah({ navigation }) {
             headers: {
                 Authorization: `Bearer ${await getStoreData("access_token")}`,
             },
-        });
+        }); 
+        dispatch(addJamaah(formData));
+        
         setCustomerAdded(true); 
         Alert.alert("Jamaah successfully added");
         navigation.navigate("Home");
@@ -46,52 +52,10 @@ export default function Tambah_jamaah({ navigation }) {
         console.log(err);
     }
 };
-
-    // fetch partners
-    const fetchPartners = async () => {
-        try {
-    
-          // Mengirim permintaan GET dengan Axios
-          const response = await axios.get('/partners', {
-            headers: {
-              Authorization: `Bearer ${await getStoreData("access_token")}`,
-            },
-          });
-    
-          // Menggunakan data dari response
-          setPartnerData(response.data);
-          setLoading(false);
-        } catch (error) {
-          // Handle error dengan benar
-          console.error('Error fetching data:', error);
-        }
-      };
-    
-    // fetch paket
-    const fetchDataPaket = async () => {
-        try {
-    
-          // Mengirim permintaan GET dengan Axios
-          const response = await axios.get('/products', {
-            headers: {
-              Authorization: `Bearer ${await getStoreData("access_token")}`,
-            },
-          });
-    
-          // Menggunakan data dari response
-          setPaketData(response.data);
-          // console.log(response.data);
-          setLoading(false);
-        } catch (error) {
-          // Handle error dengan benar
-          console.error('Error fetching data:', error);
-        }
-      };
-    
-      useEffect(() => {
-        fetchPartners();
-        fetchDataPaket();
-      }, []);
+        useEffect(() => {
+        dispatch(fetchPartners());
+        dispatch(fetchDataPaket());
+        }, [dispatch]);
 
       const handleReset = () => {
         setCustomerAdded(false);
@@ -172,9 +136,7 @@ const handleSubmit = () => {
             </View>
             <Text>Mitra</Text>
             <View style={styles.inputOption}>
-                {loading ? (
-                    <Text>Loading...</Text> // Tampilkan pesan loading selama data dimuat
-                ) : (
+               
                     <Picker
                         selectedValue={selectedMitra}
                         onValueChange={(itemValue, itemIndex) => setSelectedMitra(itemValue)}
@@ -190,21 +152,8 @@ const handleSubmit = () => {
                             />
                         ))}
                     </Picker>
-                )}
+        
             </View>
-            {/* <Text>Mitra</Text>
-            <View style={styles.inputOption}>
-                <Picker
-                    selectedValue={selectedMitra}
-                    onValueChange={(itemValue, itemIndex) => setSelectedMitra(itemValue)}
-                    style={styles.pickerItemStyle}
-                >
-                    <Picker.Item style={styles.pickerItemPilih} label="Pilih Mitra" value="" />
-                    <Picker.Item style={styles.pickerItemStyle} label="Mitra A" value="Mitra A" />
-                    <Picker.Item style={styles.pickerItemStyle} label="Mitra B" value="Mitra B" />
-                    <Picker.Item style={styles.pickerItemStyle} label="Mitra C" value="Mitra C" />
-                </Picker>
-            </View> */}
             <TouchableOpacity
                 style={styles.submitButton}
                 onPress={handleSubmit}
@@ -214,6 +163,18 @@ const handleSubmit = () => {
         </View>
     );
 }
+
+const mapStateToProps = (state) => ({
+    paketData: state.jamaah.paketData,
+    partnerData: state.jamaah.partnerData,
+  });
+  
+  const mapDispatchToProps = {
+      fetchDataPaket,
+      fetchPartners
+  };
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Tambah_jamaah);
 
 const styles = StyleSheet.create({
     container: {

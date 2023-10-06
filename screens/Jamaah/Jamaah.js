@@ -21,16 +21,20 @@ import { getStoreData } from "../../util/util.js";
 import { instance as axios } from "../../util/api.js";
 import ListHeader from "../../components/Jamaah/ListHeader.js";
 import JamaahTable from "../../components/Jamaah/JamaahTable.js";
+import { fetchCustomerData } from '../../store/actions/jamaahActions.js';
+import { connect, useDispatch, useSelector } from 'react-redux';
 
 
-export default function Jamaah({ navigation }) {
+function Jamaah({ navigation }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
   const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage);
-  // customers
-  const [customerData, setCustomerData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  
+  const customerData = useSelector(state => state.jamaah.customerData);
+  console.log("niiiiiii",customerData);
+  
+  const dispatch = useDispatch();
 
   // Handle perubahan jumlah baris per halaman
   const changeItemsPerPage = (newPerPage) => {
@@ -61,30 +65,10 @@ export default function Jamaah({ navigation }) {
   const gotoAddJamaah = () => {
     navigation.navigate("Tambah Jamaah");
   };
-  // Fungsi untuk mengambil data dengan token dari AsyncStorage
-  const fetchData = async () => {
-    try {
-
-      // Mengirim permintaan GET dengan Axios
-      const response = await axios.get('/customers', {
-        headers: {
-          Authorization: `Bearer ${await getStoreData("access_token")}`,
-        },
-      });
-
-      // Menggunakan data dari response
-      setCustomerData(response.data);
-      // console.log(response.data);
-      setLoading(false);
-    } catch (error) {
-      // Handle error dengan benar
-      console.error('Error fetching data:', error);
-    }
-  };
-  useEffect(() => {
-    fetchData();
-  }, []);
-
+  
+useEffect(() => {
+  dispatch(fetchCustomerData());
+}, [dispatch]);
 
   return (
     <View>
@@ -139,7 +123,7 @@ export default function Jamaah({ navigation }) {
               keyExtractor={(item) => item.id.toString()}
               ListHeaderComponent={() => (<ListHeader/>)}
               renderItem={({ item, index }) => (
-               <JamaahTable item={item} index={index} setCustomerData={setCustomerData} navigation={navigation} />
+               <JamaahTable item={item} index={index} navigation={navigation} />
               )}
             />
           </View>
@@ -210,6 +194,18 @@ export default function Jamaah({ navigation }) {
     </View>
   );
 }
+
+const mapStateToProps = (state) => ({
+  customerData: state.jamaah.customerData,
+  loading: state.jamaah.loading,
+  error: state.jamaah.error,
+});
+
+const mapDispatchToProps = {
+  fetchCustomerData,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Jamaah);
 
 const styles = StyleSheet.create({
   container: {

@@ -1,14 +1,12 @@
-// // store.js
-// import { configureStore } from '@reduxjs/toolkit';
-// import jamaahReducer from './reducers/jamaahReducer'; 
-// import { TambahJamaah } from './actions/jamaahActions'; // Sesuaikan dengan path aksi Anda
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import jamaahReducer from './reducers/jamaahReducer.js';
+import thunk from 'redux-thunk';
 
-// const store = configureStore({
-//   reducer: {
-//     jamaah: jamaahReducer, // Sesuaikan dengan nama slice Anda
-//   },
-// });
+const rootReducer = combineReducers({
+  jamaah: jamaahReducer,
+  // Add other reducers here if needed
+});
 
-// export default store;
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
-// export { TambahJamaah }; // Ekspor aksi Redux untuk digunakan dalam komponen
+export default store;

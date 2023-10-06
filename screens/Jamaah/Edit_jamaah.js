@@ -14,8 +14,11 @@ import * as ImagePicker from "expo-image-picker";
 import { getStoreData } from "../../util/util";
 import { instance as axios } from "../../util/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Stepper from "../../components/Jamaah/Stepper";
+import { connect, useDispatch, useSelector } from "react-redux";
+import { fetchDataPaket,  fetchPartners } from '../../store/actions/jamaahActions.js';
 
-export default function Edit_jamaah({ navigation, route }) {
+function Edit_jamaah({ navigation, route }) {
   const [jamaah, setJamaah] = useState([]);
   const { voucherCode } = route.params;
   // state input
@@ -86,12 +89,21 @@ export default function Edit_jamaah({ navigation, route }) {
   const [yellowBookFile, setYellowBookFile] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
   const [arrivalBoardingPassFile, setArrivalBoardingPassFile] = useState(null);
-  const [manasikCompleted, setManasikCompleted] = useState(true); // manasik
+
+  const [registrasi, setRegistrasi] = useState(true); // registrasi
+  const [pelunasan, setPelunasan] = useState(true); //pelunasan
+  const [manasikCompleted, setManasikCompleted] = useState(false); // manasik
   const [siskopatuhCompleted, setSiskopatuhCompleted] = useState(false); //siskopatuh
-  const [amenitiesCompleted, setAmenitiesCompleted] = useState(true); // perlengkapan
+  const [amenitiesCompleted, setAmenitiesCompleted] = useState(false); // perlengkapan
   const [takeOff, setTakeOff] = useState(false); //take off
-  const [journeyCompleted, setJourneyCompleted] = useState(true); //completed
-  const [isChecked, setIsChecked] = useState(false);
+  const [journeyCompleted, setJourneyCompleted] = useState(false); //completed
+  const [indexChecked, setIndexChecked] = useState(null);
+  const validationMessages = {
+    siskopatuh: "Gagal mengubah status SISKOPATUH. Mohon lengkapi data Jama'ah untuk menghindari kesalahan validasi SISKOPATUH",
+    amenities: "Gagal mengubah status PERLENGKAPAN. Mohon Selesaikan SISKOPATUH",
+    takeOff: "Gagal mengubah status TAKE OFF. Pembayaran belum lunas!",
+    journeyCompleted: "Gagal mengubah status perjalanan Jama'ah ke selesai. Jama'ah belum melakukan perjalanan!",
+  };
 
   const [gender, setGender] = useState(true);
   const [wni, setWni] = useState(true);
@@ -108,10 +120,12 @@ export default function Edit_jamaah({ navigation, route }) {
   const [loading, setLoading] = useState(true);
 
   //fetch data
-  const [partnerData, setPartnerData] = useState([]);
-  const [paketData, setPaketData] = useState([]);
+  const partnerData = useSelector(state => state.jamaah.partnerData);
+  const paketData = useSelector(state => state.jamaah.paketData);
   const [visaData, setVisaData] = useState([]);
   const [insuranceData, setInsuranceData] = useState([]);
+  const [dataStatus, setdataStatus] = useState({});
+  const dispatch = useDispatch();
 
   //  date picker
   const [date, setDate] = useState(new Date());
@@ -189,12 +203,13 @@ export default function Edit_jamaah({ navigation, route }) {
         vaccineCert3File: vaccineCert3File,
         yellowBookFile: yellowBookFile,
         photoFile: photoFile,
-        manasikCompleted: manasikCompleted,
-        siskopatuhCompleted: siskopatuhCompleted,
-        amenitiesCompleted: amenitiesCompleted,
-        takeOff: takeOff,
-        journeyCompleted: journeyCompleted,
+        // manasikCompleted: manasikCompleted,
+        // siskopatuhCompleted: siskopatuhCompleted,
+        // amenitiesCompleted: amenitiesCompleted,
+        // takeOff: takeOff,
+        // journeyCompleted: journeyCompleted,
         arrivalBoardingPassFile: arrivalBoardingPassFile,
+        ...dataStatus
       };
 
       console.log("ini form data", formData);
@@ -217,8 +232,9 @@ export default function Edit_jamaah({ navigation, route }) {
       const response = await axios.get(`/customers/${voucherCode}`, {
         headers: {
           Authorization: `Bearer ${await getStoreData("access_token")}`,
-        },
+        }, 
       });
+      setJamaah(response.data.data)
       setNama(response.data.data.fullName);
       setNik(response.data.data.icNo);
       setNoTelepon(response.data.data.mobileNo);
@@ -298,11 +314,12 @@ export default function Edit_jamaah({ navigation, route }) {
 
   // Fungsi untuk mengonversi format tanggal ke "dd/MM/yyyy"
   const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+  
 
   const onChange = (event, selectedDate) => {
     setShow(false);
@@ -433,43 +450,6 @@ export default function Edit_jamaah({ navigation, route }) {
     return null;
   };
 
-  // fetch partners
-  const fetchPartners = async () => {
-    try {
-      // Mengirim permintaan GET dengan Axios
-      const response = await axios.get("/partners", {
-        headers: {
-          Authorization: `Bearer ${await getStoreData("access_token")}`,
-        },
-      });
-
-      // Menggunakan data dari response
-      setPartnerData(response.data);
-      setLoading(false);
-    } catch (error) {
-      // Handle error dengan benar
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  // fetch paket
-  const fetchDataPaket = async () => {
-    try {
-      // Mengirim permintaan GET dengan Axios
-      const response = await axios.get("/products", {
-        headers: {
-          Authorization: `Bearer ${await getStoreData("access_token")}`,
-        },
-      });
-
-      // Menggunakan data dari response
-      setPaketData(response.data);
-      setLoading(false);
-    } catch (error) {
-      // Handle error dengan benar
-      console.error("Error fetching data:", error);
-    }
-  };
   // fetch Insurance
   const fetchDataInsurance = async () => {
     try {
@@ -508,18 +488,21 @@ export default function Edit_jamaah({ navigation, route }) {
   };
 
   useEffect(() => {
-    fetchPartners();
-    fetchDataPaket();
+    // fetchPartners();
+    // fetchDataPaket();
+    dispatch(fetchPartners());
+    dispatch(fetchDataPaket());
     fetchDataInsurance();
     fetchDataVisa();
     fetchCustomerId();
-  }, []);
+  }, [dispatch]);
 
   function formatDateArray(dateArray) {
     if (Array.isArray(dateArray) && dateArray.length === 3) {
       const [year, month, day] = dateArray;
-      const formattedMonth = month.toString().padStart(2, '0'); // Tambahkan nol jika bulan kurang dari 10
-      const formattedDate = `${day}/${formattedMonth}/${year}`;
+      const formattedMonth = month < 10 ? `0${month}` : month;
+      const formattedDay = day < 10 ? `0${day}` : day;
+      const formattedDate = `${formattedDay}/${formattedMonth}/${year}`;
       return formattedDate;
     }
     return ""; // Default jika data tidak valid
@@ -546,31 +529,27 @@ export default function Edit_jamaah({ navigation, route }) {
   const formattedData = formatMultipleDates(jamaah);
   //   console.log(formattedData);
 
+
+  const payloadStepper = {
+    registrasi:registrasi,
+    paymentCompleted:pelunasan,
+    manasikCompleted:manasikCompleted,
+    siskopatuhCompleted:siskopatuhCompleted,
+    amenitiesCompleted:amenitiesCompleted,
+    takeOff:takeOff,
+    journeyCompleted:journeyCompleted
+  }
+  
   useEffect(() => {
-    // Ambil nilai dari database atau sumber data lainnya
-    // Di sini, saya akan menggunakan objek sumber data sebagai contoh
-    const dataFromDatabase = {
-      journeyCompleted: true,
-      siskopatuhCompleted: false,
-      amenitiesCompleted: true,
-      takeOff: false,
-      manasikCompleted: true,
-    };
+    //console.log("cccc",tes)
+    setdataStatus(payloadStepper)
+  }, [registrasi,pelunasan,manasikCompleted,siskopatuhCompleted,amenitiesCompleted,takeOff,journeyCompleted])
 
-    // Setel nilai state berdasarkan nilai dari database atau sumber data
-    setJourneyCompleted(dataFromDatabase.journeyCompleted);
-    setSiskopatuhCompleted(dataFromDatabase.siskopatuhCompleted);
-    setAmenitiesCompleted(dataFromDatabase.amenitiesCompleted);
-    setTakeOff(dataFromDatabase.takeOff);
-    setManasikCompleted(dataFromDatabase.manasikCompleted);
-  }, []);
-
-  const handleToggle = (setter) => {
-    // Pastikan untuk menonaktifkan cekbok jika nilainya false
-    if (setter === false) {
-      return;
-    }
+  const handleToggle = (setState, newValue, index) => {
+    setState(newValue);
+    setIndexChecked(index)
   };
+
 
   const handleSubmit = () => {
     if (!fullName || !icNo || !mobileNo || !productId || !fatherName) {
@@ -585,6 +564,47 @@ export default function Edit_jamaah({ navigation, route }) {
       return;
     }
 
+    // Validasi untuk Stepper
+    if (indexChecked === 4) {
+      if ( !amenitiesCompleted || !city || !dateOfBirth || !district || !email ||
+        !fatherName || !fullName || !gender || !healthCondition || !icFile ||
+        !icNo || !infantChargedAmount || !infantDob || !infantName || !infantNik ||
+        !insurance || !insuranceCustomerName || !insurancePolicyNo || !kkFile ||
+        !kkNo || !mahram || !mahramRelationship || !manasikCompleted || !maritalStatus ||
+        !mobileNo || !nameOnPassport || !occupation || !selectedMitra ||
+        !passportExpiredOn || !passportFile || !passportName || !passportNo ||
+        !photoFile || !placeOfBirth || !postalCode ||
+        !productId || !province || !registrasi || !siskopatuhCompleted ||
+        !streetAddress || !subDistrict || !upgradedAirlineClass ||
+        !upgradedAirlineCode || !upgradedAirlineName || !upgradedAirlinePrice ||
+        !upgradedHotelName || !upgradedHotelPrice || !upgradedHotelRoomType ||
+        !upgradedHotelStar || !vaccineCert2File || !vaccineCert3File ||
+        !vaccineCertFile || !visaExpiredAt || !visaIssuedOn || !visaName ||
+        !visaNo || !visaProvider || !wni || !yellowBookFile ) {
+      Alert.alert("Gagal mengubah status SISKOPATUH. Mohon lengkapi data Jama'ah untuk menghindari kesalahan validasi SISKOPATUH");
+      setSiskopatuhCompleted(false)
+      }else{
+        setSiskopatuhCompleted(true)
+      }
+    }
+  
+    if (indexChecked === 6) {
+      if (!siskopatuhCompleted  ) {
+        Alert.alert('Gagal mengubah status TAKE OFF. Pembayaran belum lunas!');
+        setTakeOff(false);
+      } else {
+        setTakeOff(true);
+      }
+    }
+    
+    if (!takeOff && indexChecked === 7) {
+      Alert.alert("Gagal mengubah status perjalanan Jama'ah ke selesai. Jama'ah belum melakukan perjalanan!");
+      setJourneyCompleted(false)
+      return;
+    }else{
+
+    }
+
     updateJamaah();
   };
 
@@ -593,145 +613,107 @@ export default function Edit_jamaah({ navigation, route }) {
       {/* Checkbox */}
       <ScrollView>
         <ScrollView horizontal={true} style={styles.checklist}>
-          <View style={styles.checkboxContainer}>
-            {/* registrasi */}
-            <TouchableOpacity onPress={handleToggle}>
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    isChecked
-                      ? styles.checkboxChecked
-                      : styles.checkboxUnchecked
-                  }
-                >
-                  {isChecked && <Text style={styles.checkIcon}>&#10003;</Text>}
-                </View>
-                <Text style={styles.checkboxLabel}>Registrasi</Text>
-              </View>
-            </TouchableOpacity>
-            <View style={styles.horizontalLine} />
-            {/* pelunasan */}
-            <TouchableOpacity onPress={handleToggle}>
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    isChecked
-                      ? styles.checkboxChecked
-                      : styles.checkboxUnchecked
-                  }
-                >
-                  {isChecked && <Text style={styles.checkIcon}>&#10003;</Text>}
-                </View>
-                <Text style={styles.checkboxLabel}>Pelunasan</Text>
-              </View>
-            </TouchableOpacity>
-            <View style={styles.horizontalLine} />
-
-            {/* Manasik Checkbox */}
-            <TouchableOpacity
-              onPress={() => handleToggle(setManasikCompleted)}
-              disabled={!manasikCompleted}
-            >
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    manasikCompleted
-                      ? styles.checkboxChecked
-                      : styles.checkboxUnchecked
-                  }
-                >
-                  {manasikCompleted && (
-                    <Text style={styles.checkIcon}>&#10003;</Text>
-                  )}
-                </View>
-              </View>
-              <Text style={styles.checkboxLabel}>Manasik</Text>
-            </TouchableOpacity>
-            <View style={styles.horizontalLine} />
-
-            {/* Siskopatuh Checkbox */}
-            <TouchableOpacity
-              onPress={() => handleToggle(setSiskopatuhCompleted)}
-              disabled={!siskopatuhCompleted}
-            >
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    siskopatuhCompleted
-                      ? styles.checkboxChecked
-                      : styles.checkboxUnchecked
-                  }
-                >
-                  {siskopatuhCompleted && (
-                    <Text style={styles.checkIcon}>&#10003;</Text>
-                  )}
-                </View>
-              </View>
-              <Text style={styles.checkboxLabel}>Siskopatuh</Text>
-            </TouchableOpacity>
-            <View style={styles.horizontalLine} />
-
-            {/* Perlengkapan Checkbox */}
-            <TouchableOpacity
-              onPress={() => handleToggle(setAmenitiesCompleted)}
-              disabled={!amenitiesCompleted}
-            >
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    amenitiesCompleted
-                      ? styles.checkboxChecked
-                      : styles.checkboxUnchecked
-                  }
-                >
-                  {amenitiesCompleted && (
-                    <Text style={styles.checkIcon}>&#10003;</Text>
-                  )}
-                </View>
-              </View>
-              <Text style={styles.checkboxLabel}>Perlengkapan</Text>
-            </TouchableOpacity>
-            <View style={styles.horizontalLine} />
-
-            {/* Take Off Checkbox */}
-            <TouchableOpacity
-              onPress={() => handleToggle(setTakeOff)}
-              disabled={!takeOff}
-            >
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    takeOff ? styles.checkboxChecked : styles.checkboxUnchecked
-                  }
-                >
-                  {takeOff && <Text style={styles.checkIcon}>&#10003;</Text>}
-                </View>
-              </View>
-              <Text style={styles.checkboxLabel}>Take Off</Text>
-            </TouchableOpacity>
-            <View style={styles.horizontalLine} />
-
-            {/* Completed Checkbox */}
-            <TouchableOpacity
-              onPress={() => handleToggle(setJourneyCompleted)}
-              disabled={!journeyCompleted}
-            >
-              <View style={styles.checkboxAndText}>
-                <View
-                  style={
-                    journeyCompleted
-                      ? styles.checkboxChecked
-                      : styles.checkboxUnchecked
-                  }
-                >
-                  {journeyCompleted && (
-                    <Text style={styles.checkIcon}>&#10003;</Text>
-                  )}
-                </View>
-              </View>
-              <Text style={styles.checkboxLabel}>Completed</Text>
-            </TouchableOpacity>
+        {/* Registrasi Checkbox */}
+      <TouchableOpacity disabled={true}>
+        <View style={styles.checkboxAndText}>
+          <View style={styles.checkboxChecked}>
+            <Text style={styles.checkIcon}>&#10003;</Text>
           </View>
+          <Text style={styles.checkboxLabel}>Registrasi</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.horizontalLine} />
+
+      {/* Pelunasan Checkbox */}
+      <TouchableOpacity disabled={true}>
+        <View style={styles.checkboxAndText}>
+          <View style={styles.checkboxChecked}>
+            <Text style={styles.checkIcon}>&#10003;</Text>
+          </View>
+          <Text style={styles.checkboxLabel}>Pelunasan</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.horizontalLine} />
+
+      {/* Manasik Checkbox */}
+      <TouchableOpacity
+        onPress={() => handleToggle(setManasikCompleted, !manasikCompleted, 3)}
+        disabled={false}
+      >
+        <View style={styles.checkboxAndText}>
+        <View
+        style={manasikCompleted ? styles.checkboxChecked : styles.checkboxUnchecked}
+      >
+        {manasikCompleted && <Text style={styles.checkIcon}>&#10003;</Text>}
+      </View>
+
+          <Text style={styles.checkboxLabel}>Manasik</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.horizontalLine} />
+
+      {/* Siskopatuh Checkbox */}
+      <TouchableOpacity
+      onPress={() => handleToggle(setSiskopatuhCompleted, !siskopatuhCompleted, 4)}
+      disabled={false}
+    >
+      <View style={styles.checkboxAndText}>
+      <View
+      style={siskopatuhCompleted ? styles.checkboxChecked : styles.checkboxUnchecked}
+    >
+      {siskopatuhCompleted && <Text style={styles.checkIcon}>&#10003;</Text>}
+    </View>
+      <Text style={styles.checkboxLabel}>Siskopatuh</Text>
+      </View>
+    </TouchableOpacity>
+    <View style={styles.horizontalLine} />
+
+      {/* Perlengkapan Checkbox */}
+      <TouchableOpacity
+        onPress={() => handleToggle(setAmenitiesCompleted, !amenitiesCompleted, 5)}
+        disabled={false}
+      >
+        <View style={styles.checkboxAndText}>
+          <View
+            style={amenitiesCompleted ? styles.checkboxChecked : styles.checkboxUnchecked}
+          >
+            {amenitiesCompleted && <Text style={styles.checkIcon}>&#10003;</Text>}
+          </View>
+          <Text style={styles.checkboxLabel}>Perlengkapan</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.horizontalLine} />
+
+      {/* Take Off Checkbox */}
+      <TouchableOpacity
+        onPress={() => handleToggle(setTakeOff, !takeOff, 6)}
+        disabled={false}
+      >
+        <View style={styles.checkboxAndText}>
+          <View
+            style={takeOff ? styles.checkboxChecked : styles.checkboxUnchecked}
+          >
+            {takeOff && <Text style={styles.checkIcon}>&#10003;</Text>}
+          </View>
+          <Text style={styles.checkboxLabel}>Take Off</Text>
+        </View>
+      </TouchableOpacity>
+      <View style={styles.horizontalLine} />
+
+      {/* Completed Checkbox */}
+      <TouchableOpacity
+        onPress={() => handleToggle(setJourneyCompleted, !journeyCompleted, 7)}
+        disabled={false}
+      >
+        <View style={styles.checkboxAndText}>
+          <View
+            style={journeyCompleted ? styles.checkboxChecked : styles.checkboxUnchecked}
+          >
+            {journeyCompleted && <Text style={styles.checkIcon}>&#10003;</Text>}
+          </View>
+          <Text style={styles.checkboxLabel}>Completed</Text>
+        </View>
+      </TouchableOpacity>
         </ScrollView>
 
         <View style={{ marginBottom: 40 }}>
@@ -764,6 +746,7 @@ export default function Edit_jamaah({ navigation, route }) {
             value={mobileNo}
           />
           <View>
+            <Text>
             {show && (
               <DateTimePicker
                 testID="dateTimePicker"
@@ -774,6 +757,7 @@ export default function Edit_jamaah({ navigation, route }) {
                 onChange={onChange}
               />
             )}
+            </Text>
           </View>
           <Text>Tanggal Lahir</Text>
           <TextInput
@@ -1322,9 +1306,7 @@ export default function Edit_jamaah({ navigation, route }) {
           </View>
           <Text>Mitra</Text>
           <View style={styles.inputOption}>
-            {loading ? (
-              <Text>Loading...</Text> // Tampilkan pesan loading selama data dimuat
-            ) : (
+           
               <Picker
                 selectedValue={selectedMitra}
                 onValueChange={(itemValue, itemIndex) =>
@@ -1346,7 +1328,6 @@ export default function Edit_jamaah({ navigation, route }) {
                   />
                 ))}
               </Picker>
-            )}
           </View>
 
           {/* Kondisi Kesehatan */}
@@ -1784,6 +1765,18 @@ export default function Edit_jamaah({ navigation, route }) {
     </View>
   );
 }
+
+const mapStateToProps = (state) => ({
+  paketData: state.jamaah.paketData,
+  partnerData: state.jamaah.partnerData,
+});
+
+const mapDispatchToProps = {
+    fetchDataPaket,
+    fetchPartners
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Edit_jamaah);
 
 const styles = StyleSheet.create({
   container: {

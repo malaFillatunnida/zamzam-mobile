@@ -1,93 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet,Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { getStoreData } from '../../util/util';
-import { instance as axios } from '../../util/api';
 import { connect, useDispatch, useSelector } from 'react-redux'; // Import connect and useDispatch
-import { addJamaah, fetchDataPaket,  fetchPartners } from '../../store/actions/jamaahActions.js';
+import { postCustomerData } from '../../store/Actions/JamaahActions.js';
+import { fetchPartners } from '../../store/Actions/MitraActions.js';
+import { fetchDataPaket } from '../../store/Actions/PaketActions.js';
 
-function Tambah_jamaah({ navigation }) {
-    // const [partnerData, setPartnerData] = useState([]);
-    // const [paketData, setPaketData] = useState([]);
-    const partnerData = useSelector(state => state.jamaah.partnerData);
-    const paketData = useSelector(state => state.jamaah.paketData);
-    const [loading, setLoading] = useState(true);
-    
+function TambahJamaah({ navigation }) {
+    const partnerData = useSelector(state => state.mitra.partnerData); // get data mitra
+    const paketData = useSelector(state => state.paket.paketData); // get data paket
+
     const [nama, setNama] = useState('');
     const [nik, setNik] = useState('');
     const [noTelepon, setNoTelepon] = useState('');
     const [selectedPaket, setSelectedPaket] = useState('');
     const [selectedMitra, setSelectedMitra] = useState('');
     const branch_id = partnerData.map((partner) => partner.branchId).toString();
-    const [customerAdded, setCustomerAdded] = useState(false);
     const dispatch = useDispatch();
 
     // add jamaah
     const tambahJamaah = async () => {
-      try {
-        const formData = {
-            icNo: nik,
-            mobileNo: noTelepon,
-            fullName: nama,
-            productId: selectedPaket,
-            partnerId: selectedMitra,
-            branchId: branch_id, // Isi dengan ID cabang yang sesuai
-            gender: true,
-            wni: true
-          };
-          
-        console.log("ini form data", formData);
-        
-        await axios.post(`/customers`, formData, {
-            headers: {
-                Authorization: `Bearer ${await getStoreData("access_token")}`,
-            },
-        }); 
-        dispatch(addJamaah(formData));
-        
-        setCustomerAdded(true); 
-        Alert.alert("Jamaah successfully added");
-        navigation.navigate("Home");
-    } catch (err) {
-        console.log(err);
-    }
-};
-        useEffect(() => {
+        try {
+            const formData = {
+                icNo: nik,
+                mobileNo: noTelepon,
+                fullName: nama,
+                productId: selectedPaket,
+                partnerId: selectedMitra,
+                branchId: branch_id, // Isi dengan ID cabang yang sesuai
+                gender: true,
+                wni: true
+            };
+
+            console.log("ini form data", formData);
+            await dispatch(postCustomerData(formData));
+
+            Alert.alert("Jamaah successfully added");
+            navigation.navigate("Home");
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    useEffect(() => {
         dispatch(fetchPartners());
         dispatch(fetchDataPaket());
-        }, [dispatch]);
+    }, [dispatch]);
 
-      const handleReset = () => {
-        setCustomerAdded(false);
+    const handleReset = () => {
         setNama('');
         setNik('');
         setNoTelepon('');
         setSelectedPaket('');
         setSelectedMitra('');
-      };
-      
+    };
 
-const handleSubmit = () => {
-    if (!nama || !nik || !noTelepon || !selectedPaket) {
-        alert('Ada field yang wajib diisi!');
-        return;  
-      }
+    const handleSubmit = () => {
+        if (!nama || !nik || !noTelepon || !selectedPaket) {
+            alert('Ada field yang wajib diisi!');
+            return;
+        }
 
-    // Periksa status produk yang dipilih
-    const selectedProduct = paketData.find(product => product.id === selectedPaket);
-    if (selectedProduct && selectedProduct.status !== 'OPEN') {
-        Alert.alert('Maaf', `Produk ${selectedProduct.productName} belum tersedia.`);
-        return;
-    }
+        // Periksa status produk yang dipilih
+        const selectedProduct = paketData.find(product => product.id === selectedPaket);
+        if (selectedProduct && selectedProduct.status !== 'OPEN') {
+            Alert.alert('Maaf', `Produk ${selectedProduct.productName} belum tersedia.`);
+            return;
+        }
 
-      tambahJamaah();
-      handleReset();
+        tambahJamaah();
+        handleReset();
 
     };
 
     return (
         <View style={styles.container}>
-         
             <Text style={styles.dataPribadi}>Data Pribadi</Text>
             <Text>Nama sesuai NIK *</Text>
             <TextInput
@@ -136,23 +123,21 @@ const handleSubmit = () => {
             </View>
             <Text>Mitra</Text>
             <View style={styles.inputOption}>
-               
-                    <Picker
-                        selectedValue={selectedMitra}
-                        onValueChange={(itemValue, itemIndex) => setSelectedMitra(itemValue)}
-                        style={styles.pickerItemStyle}
-                    >
-                        <Picker.Item style={styles.pickerItemPilih} label="Pilih Mitra" value="" />
-                        {partnerData.map((partner) => (
-                            <Picker.Item
-                                key={partner.id}
-                                style={styles.pickerItemStyle}
-                                label={partner.fullName}
-                                value={partner.id}
-                            />
-                        ))}
-                    </Picker>
-        
+                <Picker
+                    selectedValue={selectedMitra}
+                    onValueChange={(itemValue, itemIndex) => setSelectedMitra(itemValue)}
+                    style={styles.pickerItemStyle}
+                >
+                    <Picker.Item style={styles.pickerItemPilih} label="Pilih Mitra" value="" />
+                    {partnerData.map((partner) => (
+                        <Picker.Item
+                            key={partner.id}
+                            style={styles.pickerItemStyle}
+                            label={partner.fullName}
+                            value={partner.id}
+                        />
+                    ))}
+                </Picker>
             </View>
             <TouchableOpacity
                 style={styles.submitButton}
@@ -167,14 +152,16 @@ const handleSubmit = () => {
 const mapStateToProps = (state) => ({
     paketData: state.jamaah.paketData,
     partnerData: state.jamaah.partnerData,
-  });
-  
-  const mapDispatchToProps = {
-      fetchDataPaket,
-      fetchPartners
-  };
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(Tambah_jamaah);
+    customerData: state.jamaah.customerData
+});
+
+const mapDispatchToProps = {
+    fetchDataPaket,
+    fetchPartners,
+    postCustomerData
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TambahJamaah);
 
 const styles = StyleSheet.create({
     container: {

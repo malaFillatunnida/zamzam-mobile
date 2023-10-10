@@ -1,10 +1,13 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
-import jamaahReducer from './reducers/jamaahReducer.js';
 import thunk from 'redux-thunk';
+import MitraReducers from './Reducers/MitraReducers';
+import PaketReducers from './Reducers/PaketReducers';
+import JamaahReducers from './Reducers/JamaahReducers';
 
 const rootReducer = combineReducers({
-  jamaah: jamaahReducer,
-  // Add other reducers here if needed
+  jamaah: JamaahReducers,
+  paket: PaketReducers,
+  mitra: MitraReducers
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));

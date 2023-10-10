@@ -7,26 +7,29 @@ import {
     TextInput,
     TouchableOpacity
 } from "react-native";
-import { storeData } from "../util/util";
-import { instance as axios } from "../util/api";
+import { storeData } from "../../util/util";
+import { instance as axios } from "../../util/api";
 
 export default function Login({ navigation }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState(""); // State untuk menyimpan pesan error
 
     const login = async () => {
+        // Memeriksa apakah username atau password kosong
         if (!username || !password) {
             setErrorMessage("* Username dan password tidak boleh kosong!");
             return;
         }
 
         try {
+            // Mengirim permintaan POST ke server dengan username dan password
             const { data, status } = await axios.post(`/users/login`, {
                 username: username,
                 password: password,
             });
 
+            // Jika berhasil, menyimpan token akses dan menavigasi ke layar "Home"
             if (status === 200) {
                 await storeData("access_token", data.access_token);
                 navigation.navigate("Home");
@@ -41,7 +44,7 @@ export default function Login({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <Image style={styles.image} source={require("../assets/login.png")} />
+            <Image style={styles.image} source={require("../../assets/login.png")} />
             <Text style={styles.welcome}>
                 Retali Travel Umroh <Text style={{ color: "yellow" }}>Sesuai Sunnah</Text>
             </Text>
@@ -90,12 +93,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
-
     image: {
         width: 250,
         height: 250,
     },
-
     welcome: {
         color: "white",
         fontSize: 26,
@@ -104,16 +105,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         textAlign: 'center'
     },
-
     zamzam: {
         color: 'white'
     },
-
     version: {
         color: 'white',
         marginBottom: 20,
     },
-
     inputView: {
         backgroundColor: "white",
         borderRadius: 5,
@@ -121,19 +119,16 @@ const styles = StyleSheet.create({
         height: 50,
         marginBottom: 20,
     },
-
     TextInput: {
         height: 50,
         flex: 1,
         padding: 10,
         marginLeft: 20,
     },
-
     forgot_button: {
         height: 30,
         marginTop: 10,
     },
-
     loginBtn: {
         width: "80%",
         height: 50,
@@ -142,13 +137,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: "#870144",
     },
-
     loginText: {
         fontWeight: "bold",
         fontSize: 15,
         color: "white",
     },
-
     errorMessage: {
         color: "red",
         fontWeight: 'bold',

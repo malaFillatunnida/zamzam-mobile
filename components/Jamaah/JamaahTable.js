@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import {
   Feather,
@@ -8,9 +8,9 @@ import {
 
 export default function JamaahTable({ item, index, navigation }) {
   const gotoEditJamaah = (voucherCode) => {
-    // navigation.navigate("Edit Jamaah", { voucherCode });
-    navigation.navigate("Edit Jamaah", { voucherCode: voucherCode }, item={item});
+    navigation.navigate("Edit Jamaah", { voucherCode: voucherCode }, item = { item });
   };
+
   return (
     <View style={csstyle.row}>
       <Text style={[csstyle.cell, { width: 35, textAlign: "left" }]}>

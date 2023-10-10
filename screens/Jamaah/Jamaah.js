@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,197 +9,181 @@ import {
   TextInput,
   Button,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import {
   AntDesign,
-  Feather,
-  FontAwesome5,
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons/build/Icons";
 import SelectDropdown from "react-native-select-dropdown";
-import { getStoreData } from "../../util/util.js";
-import { instance as axios } from "../../util/api.js";
 import ListHeader from "../../components/Jamaah/ListHeader.js";
 import JamaahTable from "../../components/Jamaah/JamaahTable.js";
-import { fetchCustomerData } from '../../store/actions/jamaahActions.js';
+import { fetchCustomerData } from '../../store/Actions/JamaahActions.js';
 import { connect, useDispatch, useSelector } from 'react-redux';
 
-
 function Jamaah({ navigation }) {
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5); // Default value
-  const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(itemsPerPage);
-  const [loading, setLoading] = useState(true);
-  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedItemsPerPage, setSelectedItemsPerPage] = useState(5);
+  // customers
   const customerData = useSelector(state => state.jamaah.customerData);
-  console.log("niiiiiii",customerData);
-  
+
   const dispatch = useDispatch();
 
   // Handle perubahan jumlah baris per halaman
   const changeItemsPerPage = (newPerPage) => {
-  setSelectedItemsPerPage(newPerPage); // Perbarui selectedItemsPerPage
-  setItemsPerPage(newPerPage); // Perbarui itemsPerPage
+    setSelectedItemsPerPage(newPerPage);
+    setCurrentPage(1); // Reset currentPage ke 1 saat mengganti jumlah item per halaman
   };
-  const itemsPerPageOptions = ["5", "10", "20"];
 
-  // Calculate the start and end indexes for the current page
-  const startIndex = currentPage * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  // Slice the customerData to display only the rows for the current page
-  const pageData = customerData.slice(startIndex, endIndex);
+  const itemsPerPageOptions = ["5", "10", "15", "20"];
 
   // Function to handle page navigation
   const handlePrevPage = () => {
-    if (currentPage > 0) {
+    if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
+
   const handleNextPage = () => {
-    const totalPages = Math.ceil(customerData.length / itemsPerPage);
-    if (currentPage < totalPages - 1) {
-      setCurrentPage(currentPage + 1);
-    }
+    setCurrentPage(currentPage + 1);
   };
+
+  // fungsi untuk menuju ke halaman add jamaah
   const gotoAddJamaah = () => {
     navigation.navigate("Tambah Jamaah");
   };
-  
-useEffect(() => {
-  dispatch(fetchCustomerData());
-}, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchCustomerData(currentPage, selectedItemsPerPage));
+  }, [dispatch, currentPage, selectedItemsPerPage, customerData]);
 
   return (
-    <View>
-      <View style={styles.head}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", top: 4 }}>
-          Daftar Jamaah
-        </Text>
-        <TouchableOpacity
-          onPress={gotoAddJamaah}
-          style={styles.buttonContainer}
-        >
-          <View>
-            <AntDesign name="plus" size={14} color="#fff" />
-          </View>
-          <Text style={styles.buttonText}>Tambah Jamaah</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.card}>
-        <ScrollView horizontal={true} style={{ width: "auto" }}>
-          <View style={styles.container}>
-            {/* Search */}
-            <View style={styles.searchContainer}>
-              {/* Kotak Pencarian */}
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Cari Nama Lengkap"
-                autoFocus={false}
-              />
-              <View style={styles.iconContainer}>
-                <MaterialIcons
-                  name="image-search"
-                  style={styles.icons}
-                  size={20}
-                  color="#870144"
+    <ScrollView>
+      <View>
+        <View style={styles.head}>
+          <Text style={{ fontSize: 18, fontWeight: "bold", top: 4 }}>
+            Daftar Jamaah
+          </Text>
+          <TouchableOpacity
+            onPress={gotoAddJamaah}
+            style={styles.buttonContainer}
+          >
+            <View>
+              <AntDesign name="plus" size={14} color="#fff" />
+            </View>
+            <Text style={styles.buttonText}>Tambah Jamaah</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.card}>
+          <ScrollView horizontal={true} style={{ width: "auto" }}>
+            <View style={styles.container}>
+              {/* Search */}
+              <View style={styles.searchContainer}>
+                {/* Kotak Pencarian */}
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Cari Nama Lengkap"
+                  autoFocus={false}
                 />
-                <MaterialIcons
-                  name="person-search"
-                  style={styles.icons}
-                  size={20}
-                  color="#870144"
-                />
-                <MaterialCommunityIcons
-                  name="text-search"
-                  style={styles.icons}
-                  size={20}
-                  color="#870144"
-                />
+                <View style={styles.iconContainer}>
+                  <MaterialIcons
+                    name="image-search"
+                    style={styles.icons}
+                    size={20}
+                    color="#870144"
+                  />
+                  <MaterialIcons
+                    name="person-search"
+                    style={styles.icons}
+                    size={20}
+                    color="#870144"
+                  />
+                  <MaterialCommunityIcons
+                    name="text-search"
+                    style={styles.icons}
+                    size={20}
+                    color="#870144"
+                  />
+                </View>
               </View>
+              <FlatList
+                data={customerData}
+                keyExtractor={(item) => item.id.toString()}
+                ListHeaderComponent={() => (<ListHeader />)}
+                renderItem={({ item, index }) => (
+                  <JamaahTable
+                    item={item}
+                    index={index + (currentPage - 1) * selectedItemsPerPage}
+                    navigation={navigation}
+                  />
+                )}
+              />
             </View>
-            <FlatList
-              data={pageData}
-              keyExtractor={(item) => item.id.toString()}
-              ListHeaderComponent={() => (<ListHeader/>)}
-              renderItem={({ item, index }) => (
-               <JamaahTable item={item} index={index} navigation={navigation} />
-              )}
-            />
-          </View>
-        </ScrollView>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            margin: 8,
-          }}
-        >
-          <View style={styles.iconContainer}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "flex",
-                alignItems: "center",
-                height: 30,
-              }}
-            >
-              <Text>Rows per page</Text>
-              <Text style={{ marginHorizontal: 5 }}>
-                <SelectDropdown
-                  data={itemsPerPageOptions}
-                  onSelect={(selectedItem, index) => {
-                    changeItemsPerPage(parseInt(selectedItem));
-                  }}
-                  buttonTextAfterSelection={(selectedItem, index) => {
-                    return selectedItem;
-                  }}
-                  rowTextForSelection={(item, index) => {
-                    return item;
-                  }}
-                  // defaultButtonText={itemsPerPage} // Text pada tombol dropdown
-                  defaultButtonText={selectedItemsPerPage.toString()} // Ubah itemsPerPage menjadi selectedItemsPerPage
+          </ScrollView>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              margin: 8,
+            }}
+          >
+            <View style={styles.iconContainer}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex",
+                  alignItems: "center",
+                  height: 30,
+                }}
+              >
+                <Text>Rows per page</Text>
+                <Text style={{ marginHorizontal: 5 }}>
+                  <SelectDropdown
+                    data={itemsPerPageOptions}
+                    onSelect={(selectedItem, index) => {
+                      changeItemsPerPage(parseInt(selectedItem));
+                    }}
+                    buttonTextAfterSelection={(selectedItem, index) => {
+                      return selectedItem;
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      return item;
+                    }}
+                    defaultButtonText={selectedItemsPerPage.toString()} // Ubah itemsPerPage menjadi selectedItemsPerPage
 
-                  buttonStyle={styles.buttonPage}
-                  buttonTextStyle={{ fontSize: 13}}
-                  renderDropdownIcon={() => (
-                    <Text style={{ fontSize: 13 }}>▼</Text>
-                  )}
-                  dropdownTextStyle={{ fontSize: 15   }}
-                  dropdownTextHighlightStyle={{ backgroundColor: "#6E759F" }}
-                />
-              </Text>
+                    buttonStyle={styles.buttonPage}
+                    buttonTextStyle={{ fontSize: 13 }}
+                    renderDropdownIcon={() => (
+                      <Text style={{ fontSize: 13 }}>▼</Text>
+                    )}
+                    dropdownTextStyle={{ fontSize: 15 }}
+                    dropdownTextHighlightStyle={{ backgroundColor: "#6E759F" }}
+                  />
+                </Text>
+              </View>
+
+              <Button
+                title="<"
+                onPress={handlePrevPage}
+                color="#6E759F"
+                disabled={currentPage === 1}
+              />
+              <Button
+                title=">"
+                onPress={handleNextPage}
+                color="#870144"
+                disabled={customerData.length < selectedItemsPerPage}
+              />
             </View>
-
-            <Button
-              title="<"
-              onPress={handlePrevPage}
-              // buttonStyle={{ height: 5 }}
-              color="#6E759F"
-              disabled={currentPage === 0}
-            />
-            <Button
-              title=">"
-              onPress={handleNextPage}
-              // buttonStyle={{ height: 5 }}
-              color="#870144"
-              disabled={
-                currentPage === Math.ceil(customerData.length / itemsPerPage) - 1
-              }
-            />
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const mapStateToProps = (state) => ({
   customerData: state.jamaah.customerData,
-  loading: state.jamaah.loading,
-  error: state.jamaah.error,
 });
 
 const mapDispatchToProps = {
@@ -218,50 +203,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     justifyContent: "space-between",
   },
-  Hrow: {
-    flexDirection: "row",
-    // justifyContent: "space-between",
-    alignItems: "center",
-    padding: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  Hcell: {
-    flex: 1,
-    padding: 30,
-    paddingHorizontal: 15,
-    textAlign: "left",
-    backgroundColor: "#870144",
-    color: "#fff",
-  },
-  header: {
-    fontWeight: "bold",
-    padding: 12,
-    width: 120,
-  },
-  cell: {
-    flex: 1,
-    padding: 3,
-    textAlign: "left",
-    paddingHorizontal: 10,
-    fontSize: 15,
-    width: 105
-  },
   card: {
     backgroundColor: "white",
-    elevation: 4, // Efek shadow kartu
+    elevation: 4,
     marginHorizontal: 10,
     padding: 0,
     borderRadius: 4,
-    //   paddingBottom:10
   },
   searchInput: {
     height: 30,

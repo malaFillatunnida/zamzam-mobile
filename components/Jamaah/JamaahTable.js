@@ -12,20 +12,26 @@ export default function JamaahTable({ item, index, navigation }) {
   };
 
   return (
-    <View style={csstyle.row}>
+    <View style={[csstyle.row, { backgroundColor: item.customerStatus === "EXPIRED" ? '#ff5252' : 'transparent' }]}>
       <Text style={[csstyle.cell, { width: 35, textAlign: "left" }]}>
         {index + 1}
       </Text>
-      <Text style={[csstyle.cell, { width: 95, fontWeight: "bold" }]}>
+      <Text style={[csstyle.cell, { width: 90, fontWeight: "bold" }]}>
         {item.fullName}
       </Text>
       <Text style={csstyle.cell}>{item.gender ? "Perempuan" : "Laki-laki"}</Text>
       <Text style={csstyle.cell}>{item.productName}</Text>
       <Text style={[csstyle.cell, { width: 95 }]}>{item.mobileNo}</Text>
       <Text style={csstyle.cell}>{item.partnerName}</Text>
-      <Text style={csstyle.cell}>{item.branchName}</Text>
-      <Text style={[csstyle.cell, { width: 95 }]}>{item.voucherCode}</Text>
-      <Text style={[csstyle.cell, { width: 88 }]}>{item.customerStatus}</Text>
+      <Text style={[csstyle.cell, { width: 80 }]}>{item.voucherCode}</Text>
+      <Text style={[csstyle.cell, { width: 80 }]}>
+      {((item?.paymentCompleted && item?.takeOff) || (item?.manasikCompleted && item?.takeOff) || (item?.siskopatuhCompleted && item?.takeOff) || (item?.amenitiesCompleted && item?.takeOff)) ? null : (item?.paymentCompleted) ? "Lunas | " : null}
+      {((item?.manasikCompleted && item?.takeOff) || (item?.siskopatuhCompleted && item?.takeOff) || (item?.amenitiesCompleted && item?.takeOff)) ? null : (item?.manasikCompleted) ? "Manasik | " : null}
+      {((item?.siskopatuhCompleted && item?.takeOff) || (item?.amenitiesCompleted && item?.takeOff)) ? null : (item?.siskopatuhCompleted) ? "Siskopatuh | " : null}
+      {(item?.amenitiesCompleted && item?.takeOff) ? null : (item?.amenitiesCompleted) ? "Perlengkapan | " : null}
+      {((item?.takeOff && item?.journeyCompleted) || (item?.journeyCompleted)) ? null : (item?.takeOff) ? "Take Off" : null}
+      {(item?.journeyCompleted) ? "Selesai" : null}
+      </Text>
       <Text style={csstyle.cell}>
         <View style={csstyle.iconContainer}>
           <TouchableOpacity onPress={() => gotoEditJamaah(item.voucherCode)}>

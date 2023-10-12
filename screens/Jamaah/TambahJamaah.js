@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { connect, useDispatch, useSelector } from 'react-redux'; // Import connect and useDispatch
-import { postCustomerData } from '../../store/Actions/JamaahActions.js';
-import { fetchPartners } from '../../store/Actions/MitraActions.js';
-import { fetchDataPaket } from '../../store/Actions/PaketActions.js';
+import { connect, useDispatch, useSelector } from 'react-redux'; 
+import { fetchDataPaket } from '../../store/actions/PaketActions.js';
+import { postCustomerData } from '../../store/actions/jamaahActions.js';
+import { fetchPartners } from '../../store/actions/MitraActions.js';
 
 function TambahJamaah({ navigation }) {
     const partnerData = useSelector(state => state.mitra.partnerData); // get data mitra

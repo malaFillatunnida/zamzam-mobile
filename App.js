@@ -5,7 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import HomeScreen from "./screens/HomeScreen.js";
 import Login from "./screens/Auth/Login.js";
-import Edit_jamaah from "./screens/Jamaah/Edit_jamaah.js";
+import EditJamaah from "./screens/Jamaah/EditJamaah.js";
 import UploadDetail from "./screens/Jamaah/UploadDetail.js";
 import TambahJamaah from "./screens/Jamaah/TambahJamaah.js";
 
@@ -41,7 +41,7 @@ export default function App() {
 
           <Stack.Screen
             name="Edit Jamaah"
-            component={Edit_jamaah}
+            component={EditJamaah}
             options={{
               headerStyle: {
                 backgroundColor: "#870144",

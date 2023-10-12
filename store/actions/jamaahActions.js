@@ -33,6 +33,34 @@ export const fetchCustomerData = (currentPage, selectedItemsPerPage) => {
         }
     };
 };
+// GETByVOucher Jamaah
+export const fetchCustomerByVoucherSuccess = (data) => ({
+    type: 'FETCH_CUSTOMER_VOUCHER_SUCCESS',
+    payload: data,
+});
+
+export const fetchCustomerByVoucherFailure = (error) => ({
+    type: 'FETCH_CUSTOMER_VOUCHER_FAILURE',
+    payload: error,
+});
+
+export const fetchCustomerDataByVoucher = (voucherCode) => {
+    return async (dispatch) => {
+      try {
+        const token = await getStoreData("access_token");
+  
+        const response = await axios.get(`/customers/${voucherCode}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        dispatch(fetchCustomerByVoucherSuccess(response.data));
+      } catch (error) {
+        dispatch(fetchCustomerByVoucherFailure(error));
+      }
+    };
+  };
 
 // POST Jamaah
 export const addJamaahSuccess = (data) => ({
@@ -56,11 +84,38 @@ export const postCustomerData = (data) => {
                 },
             });
 
-            // Jika permintaan berhasil, salurkan data jamaah yang berhasil ditambahkan ke reducer
             dispatch(addJamaahSuccess(response.data));
         } catch (error) {
-            // Jika terjadi kesalahan, salurkan kesalahan ke reducer
             dispatch(addJamaahFailure(error));
+        }
+    };
+};
+
+// Update Jamaah
+export const updateJamaahSuccess = (data) => ({
+    type: 'UPDATE_JAMAAH_SUCCESS',
+    payload: data,
+});
+
+export const updateJamaahFailure = (error) => ({
+    type: 'UPDATE_JAMAAH_FAILURE',
+    payload: error,
+});
+
+export const updateCustomerData = (data,voucherCode) => {
+    return async (dispatch) => {
+        try {
+            const token = await getStoreData("access_token");
+
+            const response = await axios.put(`/customers/${voucherCode}`, data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            dispatch(updateJamaahSuccess(response.data));
+        } catch (error) {
+            dispatch(updateJamaahFailure(error));
         }
     };
 };

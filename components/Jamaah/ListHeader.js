@@ -25,7 +25,6 @@ export default function ListHeader() {
       <Text style={[styles.Hcell, styles.header]}>NAMA PAKET</Text>
       <Text style={[styles.Hcell, styles.header]}>NO TELP/HP</Text>
       <Text style={[styles.Hcell, styles.header]}>MITRA</Text>
-      <Text style={[styles.Hcell, styles.header]}>CABANG</Text>
       <Text style={[styles.Hcell, styles.header]}>
         VOUCHER CODE
       </Text>

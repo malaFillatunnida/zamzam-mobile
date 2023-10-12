@@ -7,7 +7,8 @@ import {
 } from "@expo/vector-icons";
 import Jamaah from "./Jamaah/Jamaah.js";
 import { FontAwesome5 } from "@expo/vector-icons/build/Icons.js";
-import Paket from "./Paket/Paket.js";
+import Paket from "./paket/Paket.js";
+
 
 const Tab = createBottomTabNavigator();
 

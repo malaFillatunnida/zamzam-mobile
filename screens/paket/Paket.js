@@ -10,7 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import SelectDropdown from "react-native-select-dropdown";
 import { connect, useDispatch, useSelector } from "react-redux";
-import { fetchPaketDataByLimit } from "../../store/Actions/PaketActions";
+import { fetchPaketDataByLimit } from "../../store/actions/PaketActions";
 import PaketTable from "../../components/Paket/PaketTable";
 import ListHeader from "../../components/Paket/ListHeader";
 

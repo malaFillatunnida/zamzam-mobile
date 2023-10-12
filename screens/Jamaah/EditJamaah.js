@@ -14,11 +14,11 @@ import * as ImagePicker from "expo-image-picker";
 import { getStoreData } from "../../util/util";
 import { instance as axios } from "../../util/api";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import Stepper from "../../components/Jamaah/Stepper";
 import { connect, useDispatch, useSelector } from "react-redux";
-import { fetchDataPaket,  fetchPartners } from '../../store/actions/jamaahActions.js';
+import { fetchDataPaket } from "../../store/actions/PaketActions";
+import { fetchPartners } from "../../store/actions/MitraActions";
 
-function Edit_jamaah({ navigation, route }) {
+function EditJamaah({ navigation, route }) {
   const [jamaah, setJamaah] = useState([]);
   const { voucherCode } = route.params;
   // state input
@@ -91,19 +91,14 @@ function Edit_jamaah({ navigation, route }) {
   const [arrivalBoardingPassFile, setArrivalBoardingPassFile] = useState(null);
 
   const [registrasi, setRegistrasi] = useState(true); // registrasi
-  const [pelunasan, setPelunasan] = useState(true); //pelunasan
+  const [paymentCompleted, setPaymentCompleted] = useState(false); //pelunasan
   const [manasikCompleted, setManasikCompleted] = useState(false); // manasik
   const [siskopatuhCompleted, setSiskopatuhCompleted] = useState(false); //siskopatuh
   const [amenitiesCompleted, setAmenitiesCompleted] = useState(false); // perlengkapan
   const [takeOff, setTakeOff] = useState(false); //take off
   const [journeyCompleted, setJourneyCompleted] = useState(false); //completed
   const [indexChecked, setIndexChecked] = useState(null);
-  const validationMessages = {
-    siskopatuh: "Gagal mengubah status SISKOPATUH. Mohon lengkapi data Jama'ah untuk menghindari kesalahan validasi SISKOPATUH",
-    amenities: "Gagal mengubah status PERLENGKAPAN. Mohon Selesaikan SISKOPATUH",
-    takeOff: "Gagal mengubah status TAKE OFF. Pembayaran belum lunas!",
-    journeyCompleted: "Gagal mengubah status perjalanan Jama'ah ke selesai. Jama'ah belum melakukan perjalanan!",
-  };
+
 
   const [gender, setGender] = useState(true);
   const [wni, setWni] = useState(true);
@@ -120,8 +115,8 @@ function Edit_jamaah({ navigation, route }) {
   const [loading, setLoading] = useState(true);
 
   //fetch data
-  const partnerData = useSelector(state => state.jamaah.partnerData);
-  const paketData = useSelector(state => state.jamaah.paketData);
+  const partnerData = useSelector(state => state.mitra.partnerData);
+  const paketData = useSelector(state => state.paket.paketData);
   const [visaData, setVisaData] = useState([]);
   const [insuranceData, setInsuranceData] = useState([]);
   const [dataStatus, setdataStatus] = useState({});
@@ -203,11 +198,6 @@ function Edit_jamaah({ navigation, route }) {
         vaccineCert3File: vaccineCert3File,
         yellowBookFile: yellowBookFile,
         photoFile: photoFile,
-        // manasikCompleted: manasikCompleted,
-        // siskopatuhCompleted: siskopatuhCompleted,
-        // amenitiesCompleted: amenitiesCompleted,
-        // takeOff: takeOff,
-        // journeyCompleted: journeyCompleted,
         arrivalBoardingPassFile: arrivalBoardingPassFile,
         ...dataStatus
       };
@@ -300,12 +290,13 @@ function Edit_jamaah({ navigation, route }) {
       setVaccineCert3File(response.data.data.vaccineCert3FileName);
       setYellowBookFile(response.data.data.yellowBookFileName);
       setPhotoFile(response.data.data.photoFileName);
+      setPaymentCompleted(response.data.data.paymentCompleted);
       setManasikCompleted(response.data.data.manasikCompleted);
       setSiskopatuhCompleted(response.data.data.siskopatuhCompleted);
       setAmenitiesCompleted(response.data.data.amenitiesCompleted);
       setTakeOff(response.data.data.takeOff);
       setJourneyCompleted(response.data.data.journeyCompleted);
-      setArrivalBoardingPassFile(response.data.data.arrivalBoardingPassFileName);
+      setArrivalBoardingPassFile(response.data.data.arrivalBoardingPassFile);
       setLoading(false);
     } catch (err) {
       console.log(err);
@@ -488,8 +479,6 @@ function Edit_jamaah({ navigation, route }) {
   };
 
   useEffect(() => {
-    // fetchPartners();
-    // fetchDataPaket();
     dispatch(fetchPartners());
     dispatch(fetchDataPaket());
     fetchDataInsurance();
@@ -527,12 +516,11 @@ function Edit_jamaah({ navigation, route }) {
   }
 
   const formattedData = formatMultipleDates(jamaah);
-  //   console.log(formattedData);
 
 
   const payloadStepper = {
     registrasi:registrasi,
-    paymentCompleted:pelunasan,
+    paymentCompleted:paymentCompleted,
     manasikCompleted:manasikCompleted,
     siskopatuhCompleted:siskopatuhCompleted,
     amenitiesCompleted:amenitiesCompleted,
@@ -541,15 +529,15 @@ function Edit_jamaah({ navigation, route }) {
   }
   
   useEffect(() => {
-    //console.log("cccc",tes)
     setdataStatus(payloadStepper)
-  }, [registrasi,pelunasan,manasikCompleted,siskopatuhCompleted,amenitiesCompleted,takeOff,journeyCompleted])
+  }, [registrasi,paymentCompleted,manasikCompleted,siskopatuhCompleted,amenitiesCompleted,takeOff,journeyCompleted])
 
   const handleToggle = (setState, newValue, index) => {
     setState(newValue);
     setIndexChecked(index)
   };
 
+ 
 
   const handleSubmit = () => {
     if (!fullName || !icNo || !mobileNo || !productId || !fatherName) {
@@ -566,43 +554,60 @@ function Edit_jamaah({ navigation, route }) {
 
     // Validasi untuk Stepper
     if (indexChecked === 4) {
-      if ( !amenitiesCompleted || !city || !dateOfBirth || !district || !email ||
-        !fatherName || !fullName || !gender || !healthCondition || !icFile ||
-        !icNo || !infantChargedAmount || !infantDob || !infantName || !infantNik ||
-        !insurance || !insuranceCustomerName || !insurancePolicyNo || !kkFile ||
-        !kkNo || !mahram || !mahramRelationship || !manasikCompleted || !maritalStatus ||
-        !mobileNo || !nameOnPassport || !occupation || !selectedMitra ||
-        !passportExpiredOn || !passportFile || !passportName || !passportNo ||
-        !photoFile || !placeOfBirth || !postalCode ||
-        !productId || !province || !registrasi || !siskopatuhCompleted ||
-        !streetAddress || !subDistrict || !upgradedAirlineClass ||
-        !upgradedAirlineCode || !upgradedAirlineName || !upgradedAirlinePrice ||
-        !upgradedHotelName || !upgradedHotelPrice || !upgradedHotelRoomType ||
-        !upgradedHotelStar || !vaccineCert2File || !vaccineCert3File ||
-        !vaccineCertFile || !visaExpiredAt || !visaIssuedOn || !visaName ||
-        !visaNo || !visaProvider || !wni || !yellowBookFile ) {
-      Alert.alert("Gagal mengubah status SISKOPATUH. Mohon lengkapi data Jama'ah untuk menghindari kesalahan validasi SISKOPATUH");
-      setSiskopatuhCompleted(false)
-      }else{
-        setSiskopatuhCompleted(true)
+      if(siskopatuhCompleted){
+        if (!city || !dateOfBirth || !district || !email ||
+          !fatherName || !fullName || !gender || !healthCondition || !icFile ||
+          !icNo || !infantChargedAmount || !infantDob || !infantName || !infantNik ||
+          !insurance || !insuranceCustomerName || !insurancePolicyNo || !kkFile ||
+          !kkNo || !mahram || !mahramRelationship || !manasikCompleted || !maritalStatus ||
+          !mobileNo  || !occupation || !selectedMitra ||
+          !passportExpiredOn || !passportFile  || !passportNo ||
+          !photoFile || !placeOfBirth || !postalCode ||
+          !productId || !province || !registrasi ||
+          !streetAddress || !subDistrict || !upgradedAirlineClass ||
+          !upgradedAirlineCode || !upgradedAirlineName || !upgradedAirlinePrice ||
+          !upgradedHotelName || !upgradedHotelPrice || !upgradedHotelRoomType ||
+          !upgradedHotelStar || !vaccineCert2File || !vaccineCert3File ||
+          !vaccineCertFile || !visaExpiredAt || !visaIssuedOn || !visaName ||
+          !visaNo || !visaProvider || !wni || !yellowBookFile ) {
+          Alert.alert("Gagal mengubah status SISKOPATUH. Mohon lengkapi data Jama'ah untuk menghindari kesalahan validasi SISKOPATUH");
+        }else {
+          setTimeout(() => {
+            setSiskopatuhCompleted(true);
+          }, 0);
+        }
+      }else {
+        setSiskopatuhCompleted(false); 
       }
-    }
-  
+    } 
+    
     if (indexChecked === 6) {
-      if (!siskopatuhCompleted  ) {
-        Alert.alert('Gagal mengubah status TAKE OFF. Pembayaran belum lunas!');
-        setTakeOff(false);
+      if (takeOff) { // Tambahkan validasi apakah takeOff adalah true
+        if (!siskopatuhCompleted || !paymentCompleted) {
+          Alert.alert("Gagal mengubah status TAKE OFF. Pembayaran belum lunas!");
+        } else {
+          setTimeout(() => {
+            setTakeOff(true);
+          }, 0);
+        }
       } else {
-        setTakeOff(true);
+        // Handle jika takeOff diubah menjadi false
+        setTakeOff(false); // atau apa pun yang diperlukan
       }
     }
     
-    if (!takeOff && indexChecked === 7) {
-      Alert.alert("Gagal mengubah status perjalanan Jama'ah ke selesai. Jama'ah belum melakukan perjalanan!");
-      setJourneyCompleted(false)
-      return;
-    }else{
-
+    
+    if (indexChecked === 7) {
+      if(journeyCompleted){
+        if (!takeOff) {
+          Alert.alert("Gagal mengubah status perjalanan Jama'ah ke selesai. Jama'ah belum melakukan perjalanan!");
+        }else if(!arrivalBoardingPassFile){
+          Alert.alert("Gagal mengubah status perjalanan Jama'ah ke selesai. Mohon upload boarding pass sebagai bukti!");
+        }
+        else{
+          setJourneyCompleted(true)
+        }
+      }
     }
 
     updateJamaah();
@@ -626,13 +631,13 @@ function Edit_jamaah({ navigation, route }) {
 
       {/* Pelunasan Checkbox */}
       <TouchableOpacity disabled={true}>
-        <View style={styles.checkboxAndText}>
-          <View style={styles.checkboxChecked}>
-            <Text style={styles.checkIcon}>&#10003;</Text>
-          </View>
-          <Text style={styles.checkboxLabel}>Pelunasan</Text>
+      <View style={styles.checkboxAndText}>
+        <View style={paymentCompleted ? styles.checkboxChecked : styles.checkboxUnchecked}>
+          {paymentCompleted && <Text style={styles.checkIcon}>&#10003;</Text>}
         </View>
-      </TouchableOpacity>
+        <Text style={styles.checkboxLabel}>Pelunasan</Text>
+      </View>
+      </TouchableOpacity> 
       <View style={styles.horizontalLine} />
 
       {/* Manasik Checkbox */}
@@ -685,20 +690,21 @@ function Edit_jamaah({ navigation, route }) {
       <View style={styles.horizontalLine} />
 
       {/* Take Off Checkbox */}
-      <TouchableOpacity
-        onPress={() => handleToggle(setTakeOff, !takeOff, 6)}
-        disabled={false}
-      >
-        <View style={styles.checkboxAndText}>
-          <View
-            style={takeOff ? styles.checkboxChecked : styles.checkboxUnchecked}
-          >
-            {takeOff && <Text style={styles.checkIcon}>&#10003;</Text>}
-          </View>
-          <Text style={styles.checkboxLabel}>Take Off</Text>
+    <TouchableOpacity
+      onPress={() => handleToggle(setTakeOff, !takeOff, 6)}
+      disabled={false}
+    >
+      <View style={styles.checkboxAndText}>
+        <View
+          style={takeOff ? styles.checkboxChecked : styles.checkboxUnchecked}
+        >
+          {takeOff && <Text style={styles.checkIcon}>&#10003;</Text>}
         </View>
-      </TouchableOpacity>
-      <View style={styles.horizontalLine} />
+        <Text style={styles.checkboxLabel}>Take Off</Text>
+      </View>
+    </TouchableOpacity>
+    <View style={styles.horizontalLine} />
+
 
       {/* Completed Checkbox */}
       <TouchableOpacity
@@ -1582,7 +1588,7 @@ function Edit_jamaah({ navigation, route }) {
           <Text>Biaya tambahan untuk Infant</Text>
           <TextInput
             style={styles.input}
-            onTextChange={setInfantChargedAmount}
+            onChangeText={setInfantChargedAmount}
             keyboardType="numeric"
             placeholder="Biaya tambahan untuk Infant"
             selectionColor="#870144"
@@ -1776,7 +1782,7 @@ const mapDispatchToProps = {
     fetchPartners
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Edit_jamaah);
+export default connect(mapStateToProps, mapDispatchToProps)(EditJamaah);
 
 const styles = StyleSheet.create({
   container: {

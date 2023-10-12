@@ -17,8 +17,8 @@ import {
 import SelectDropdown from "react-native-select-dropdown";
 import ListHeader from "../../components/Jamaah/ListHeader.js";
 import JamaahTable from "../../components/Jamaah/JamaahTable.js";
-import { fetchCustomerData } from '../../store/Actions/JamaahActions.js';
 import { connect, useDispatch, useSelector } from 'react-redux';
+import { fetchCustomerData } from "../../store/actions/jamaahActions.js";
 
 function Jamaah({ navigation }) {
   const [currentPage, setCurrentPage] = useState(1);
